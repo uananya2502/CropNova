@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "purpose": "Starter CSP structure for Abhinav; agronomic compatibility constraints remain pending research.",
+    "status": "draft"
+  },
+  "variables": [
+    {
+      "variable": "crop",
+      "domain": [
+        "wheat",
+        "rice",
+        "maize",
+        "chickpea"
+      ]
+    },
+    {
+      "variable": "state",
+      "domain_source": "user_input_or_approved_location_list"
+    },
+    {
+      "variable": "district",
+      "domain_source": "user_input_or_approved_location_list"
+    },
+    {
+      "variable": "season",
+      "domain": [
+        "kharif",
+        "rabi",
+        "zaid",
+        "unknown"
+      ]
+    },
+    {
+      "variable": "soil_type",
+      "domain": [
+        "sandy",
+        "sandy_loam",
+        "loam",
+        "clay_loam",
+        "clay",
+        "other",
+        "unknown"
+      ]
+    },
+    {
+      "variable": "water_availability",
+      "domain": [
+        "rainfed",
+        "limited_irrigation",
+        "reliable_irrigation",
+        "unknown"
+      ]
+    },
+    {
+      "variable": "soil_test_available",
+      "domain": [
+        true,
+        false
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_id": "CSP_GUARD_001",
+      "description": "If location is unknown, do not return a region-specific ranked recommendation.",
+      "status": "safe_guardrail",
+      "evidence_fact_ids": [
+        "FACT_GENERAL_008"
+      ]
+    },
+    {
+      "constraint_id": "CSP_GUARD_002",
+      "description": "Do not use pending or out-of-scope facts as constraints.",
+      "status": "safe_guardrail",
+      "evidence_fact_ids": [
+        "FACT_GENERAL_009",
+        "FACT_GENERAL_010"
+      ]
+    },
+    {
+      "constraint_id": "CSP_TODO_001",
+      "description": "Add verified region/season/soil compatibility constraints for each crop.",
+      "status": "pending_research",
+      "evidence_fact_ids": []
+    },
+    {
+      "constraint_id": "CSP_TODO_002",
+      "description": "Add water/resource feasibility constraints only after evidence and input units are defined.",
+      "status": "pending_research",
+      "evidence_fact_ids": []
+    }
+  ]
+}

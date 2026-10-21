@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "purpose": "Draft guardrail/process rules for Annu",
+    "status": "draft",
+    "warning": "Do not create crop-specific thresholds without applicable verified sources."
+  },
+  "rules": [
+    {
+      "rule_id": "RULE_DATA_001",
+      "name": "Ask for location",
+      "when": [
+        {
+          "field": "location",
+          "operator": "is_missing"
+        }
+      ],
+      "then": [
+        {
+          "action": "request_field",
+          "field": "state_and_district"
+        }
+      ],
+      "evidence_fact_ids": [
+        "FACT_GENERAL_008"
+      ],
+      "status": "safe_process_rule"
+    },
+    {
+      "rule_id": "RULE_DATA_002",
+      "name": "Avoid specific fertilizer dose without soil context",
+      "when": [
+        {
+          "field": "soil_test_available",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "then": [
+        {
+          "action": "avoid_specific_fertilizer_dose"
+        },
+        {
+          "action": "suggest_soil_test_or_local_extension_advice"
+        }
+      ],
+      "evidence_fact_ids": [
+        "FACT_GENERAL_005",
+        "FACT_GENERAL_006"
+      ],
+      "status": "safe_process_rule"
+    },
+    {
+      "rule_id": "RULE_DATA_003",
+      "name": "Do not make irrigation schedule from crop name alone",
+      "when": [
+        {
+          "field": "local_water_evidence_available",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "then": [
+        {
+          "action": "ask_for_climate_soil_growth_stage_and_production_system"
+        },
+        {
+          "action": "avoid_specific_schedule"
+        }
+      ],
+      "evidence_fact_ids": [
+        "FACT_GENERAL_001",
+        "FACT_GENERAL_002",
+        "FACT_GENERAL_004"
+      ],
+      "status": "safe_process_rule"
+    },
+    {
+      "rule_id": "RULE_DATA_004",
+      "name": "Mark assessment undetermined when evidence is missing",
+      "when": [
+        {
+          "field": "required_evidence_available",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "then": [
+        {
+          "action": "set_assessment_status",
+          "value": "undetermined"
+        },
+        {
+          "action": "list_missing_information"
+        }
+      ],
+      "evidence_fact_ids": [
+        "FACT_GENERAL_009"
+      ],
+      "status": "safe_process_rule"
+    },
+    {
+      "rule_id": "RULE_DATA_005",
+      "name": "Attach evidence IDs",
+      "when": [
+        {
+          "field": "recommendation_generated",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "then": [
+        {
+          "action": "attach_fact_ids_and_source_ids"
+        }
+      ],
+      "evidence_fact_ids": [
+        "FACT_GENERAL_010"
+      ],
+      "status": "engineering_rule"
+    }
+  ]
+}
