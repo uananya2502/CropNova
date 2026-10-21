@@ -22,12 +22,14 @@
       "fact_ids": [
         "FACT_WHEAT_001",
         "FACT_WHEAT_002",
-        "FACT_WHEAT_003"
+        "FACT_WHEAT_003",
+        "FACT_WHEAT_004"
       ],
       "source_ids": [
         "SRC_FAO_WATER_001",
         "SRC_ICAR_IISS_001",
-        "SRC_ICAR_CROP_SCIENCE_001"
+        "SRC_ICAR_CROP_SCIENCE_001",
+        "SRC_CCSHAU_RABI_SEED_001"
       ],
       "status": "active_prototype"
     },
@@ -536,6 +538,28 @@
       },
       "confidence": "medium",
       "notes": "Research/process note, not a verified cultivation recommendation. Find a current official source with region and conditions before creating a recommendation or rule."
+    },
+    {
+      "fact_id": "FACT_WHEAT_004",
+      "crop_id": "wheat",
+      "category": "growing_season",
+      "statement": "CCS HAU lists wheat varieties under Rabi crops for the 2025-26 season.",
+      "value": "rabi",
+      "unit": null,
+      "source_ids": [
+        "SRC_CCSHAU_RABI_SEED_001"
+      ],
+      "verification_status": "verified_context_specific",
+      "applicability": {
+        "country": "India",
+        "state": "Haryana",
+        "district": null,
+        "soil_type": null,
+        "season": "Rabi 2025-26",
+        "growth_stage": null
+      },
+      "confidence": "high",
+      "notes": "Based on a dated university seed-availability list. Recheck current regional guidance before production use."
     }
   ],
   "sources": [
@@ -627,6 +651,22 @@
       ],
       "scope": "Use individual technology references for specific facts.",
       "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_CCSHAU_RABI_SEED_001",
+      "organization": "CCS Haryana Agricultural University",
+      "title": "Breeder Seed Available for Rabi Crops 2025-26",
+      "url": "https://www.hau.ac.in/public/notification-documents/5139/1760417226.pdf",
+      "review_status": "reviewed_for_inclusion",
+      "notes": "Lists wheat varieties for Rabi season 2025-26; evidence is season-specific."
+    },
+    {
+      "source_id": "SRC_CCSHAU_RABI_POP_001",
+      "organization": "CCS Haryana Agricultural University",
+      "title": "Package of Practices for Rabi Crops",
+      "url": "https://www.hau.ac.in/storage/app/uploads/NiJmbB1ETFnjIlnMxFONcSd41erdMftx8Sq8k2ZJ.pdf",
+      "review_status": "needs_review",
+      "notes": "Older edition; extracted chickpea soil and drainage guidance requires page-level verification and confirmation against current regional recommendations. Do not use for active recommendation rules yet."
     }
   ],
   "pending_research": [
@@ -813,6 +853,101 @@
       "status": "pending_research",
       "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
       "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_SOIL_PH_RANGE",
+      "crop_id": "wheat",
+      "topic": "soil_ph_range",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR, CCS HAU, Haryana agricultural university or KVK source establishing a wheat soil-pH suitability range; record publication date/version, region, page/section, and whether the range is optimal or represents tolerance to adverse soil conditions.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_SOIL_TEXTURE",
+      "crop_id": "wheat",
+      "topic": "soil_texture",
+      "status": "pending_research",
+      "required_evidence": "Authoritative ICAR, relevant agricultural university or KVK source documenting the crop's suitable soil textures. Record publication date/version, region, page/section, and whether the statement describes optimal conditions, observed conditions, or tolerance. Do not generalize beyond the evidence.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_SOIL_TEXTURE",
+      "crop_id": "rice",
+      "topic": "soil_texture",
+      "status": "pending_research",
+      "required_evidence": "Authoritative ICAR, relevant agricultural university or KVK source documenting the crop's suitable soil textures. Record publication date/version, region, page/section, and whether the statement describes optimal conditions, observed conditions, or tolerance. Do not generalize beyond the evidence.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_SOIL_TEXTURE",
+      "crop_id": "maize",
+      "topic": "soil_texture",
+      "status": "pending_research",
+      "required_evidence": "Authoritative ICAR, relevant agricultural university or KVK source documenting the crop's suitable soil textures. Record publication date/version, region, page/section, and whether the statement describes optimal conditions, observed conditions, or tolerance. Do not generalize beyond the evidence.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_SOIL_TEXTURE",
+      "crop_id": "chickpea",
+      "topic": "soil_texture",
+      "status": "pending_research",
+      "required_evidence": "Compare the historical CCS HAU guidance with a current official ICAR, CCS HAU or relevant KVK source. Record the current edition, publication date, region, printed page and whether each statement describes optimum conditions or an avoidance threshold. Keep rule_creation_allowed false until the evidence is reviewed.",
+      "rule_creation_allowed": false,
+      "historical_evidence": {
+        "source_id": "SRC_CCSHAU_RABI_POP_001",
+        "source_edition": "Older CCS HAU Rabi Package of Practices; publication context 2014-2015",
+        "printed_page": 36,
+        "claims_to_verify": [
+          "Well-drained loamy-sandy and light soils are described as suitable for chickpea.",
+          "The publication states an avoidance threshold of soil pH above 8.5.",
+          "The publication separately states an electrical conductivity threshold above 0.8 dS/m."
+        ],
+        "limitations": [
+          "Historical guidance; current applicability has not been confirmed.",
+          "The pH statement is an avoidance threshold, not a complete optimal pH range.",
+          "Electrical conductivity and pH are different measurements.",
+          "Do not activate a recommendation rule from this record alone."
+        ],
+        "review_status": "historical_evidence_needs_current_confirmation"
+      }
+    },
+    {
+      "research_id": "PENDING_RICE_SOIL_PH_RANGE",
+      "crop_id": "rice",
+      "topic": "soil_ph_range",
+      "status": "pending_research",
+      "required_evidence": "Authoritative ICAR, relevant agricultural university or KVK source establishing a crop-specific soil-pH range. Record publication date/version, region, page/section, and whether the range describes optimum conditions or tolerance to adverse soil. Do not treat a single optimum value as a range.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_SOIL_PH_RANGE",
+      "crop_id": "maize",
+      "topic": "soil_ph_range",
+      "status": "pending_research",
+      "required_evidence": "Authoritative ICAR, relevant agricultural university or KVK source establishing a crop-specific soil-pH range. Record publication date/version, region, page/section, and whether the range describes optimum conditions or tolerance to adverse soil. Do not treat a single optimum value as a range.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_SOIL_PH_RANGE",
+      "crop_id": "chickpea",
+      "topic": "soil_ph_range",
+      "status": "pending_research",
+      "required_evidence": "Find a current official source stating chickpea soil-pH guidance. Record publication date/version, region, page/section, and whether any value is an optimum range or an avoidance threshold. Specifically reconfirm the historical HAU statement of pH above 8.5 before use.",
+      "rule_creation_allowed": false,
+      "research_leads": [
+        {
+          "organization": "CCS Haryana Agricultural University",
+          "title": "Farm Advisory Service",
+          "url": "https://hau.ac.in/page/farm-advisory-service",
+          "finding": "Official regional advisory route; current chickpea pH threshold not confirmed."
+        },
+        {
+          "organization": "ICAR-Indian Institute of Pulses Research",
+          "title": "Chickpea technologies",
+          "url": "https://www.icar-iipr.org.in/technologies/",
+          "finding": "Official chickpea technology and variety information; no universal pH range established by this search."
+        }
+      ]
     }
   ],
   "cropnova_policies": [
