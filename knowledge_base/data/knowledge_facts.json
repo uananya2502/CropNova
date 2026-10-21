@@ -1,0 +1,49 @@
+
+{
+  "metadata": {
+    "project": "CropNova",
+    "version": "1.0",
+    "description": "Structured agricultural knowledge for a traditional AI decision-support system",
+    "status": "initial_research"
+  },
+  "crops": [
+    {
+      "crop_id": "CROP001",
+      "name": "wheat",
+      "category": "cereal",
+      "scientific_name": "Triticum aestivum",
+      "facts": [],
+      "verification_status": "pending_research",
+      "source_ids": []
+    },
+    {
+      "crop_id": "CROP002",
+      "name": "rice",
+      "category": "cereal",
+      "scientific_name": "Oryza sativa",
+      "facts": [],
+      "verification_status": "pending_research",
+      "source_ids": []
+    },
+    {
+      "crop_id": "CROP003",
+      "name": "maize",
+      "category": "cereal",
+      "scientific_name": "Zea mays",
+      "facts": [],
+      "verification_status": "pending_research",
+      "source_ids": []
+    },
+    {
+      "crop_id": "CROP004",
+      "name": "chickpea",
+      "category": "pulse",
+      "scientific_name": "Cicer arietinum",
+      "facts": [],
+      "verification_status": "pending_research",
+      "source_ids": []
+    }
+  ],
+  "sources": []
+}
+
