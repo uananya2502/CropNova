@@ -1,0 +1,17 @@
+{
+  "description": "CropNova engineering and safety policies. These are not agricultural facts and must not be treated as agronomic recommendations.",
+  "policies": [
+    {
+      "policy_id": "FACT_GENERAL_009",
+      "statement": "When required details or applicable evidence are missing, ask for information or mark the assessment undetermined.",
+      "category": "uncertainty",
+      "notes": "CropNova safety policy informed by source limitations."
+    },
+    {
+      "policy_id": "FACT_GENERAL_010",
+      "statement": "Every CropNova recommendation should retain supporting fact IDs and source IDs.",
+      "category": "traceability",
+      "notes": "Engineering requirement."
+    }
+  ]
+}
