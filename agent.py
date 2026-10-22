@@ -662,27 +662,10 @@ def _candidate_records(
             crop["crop_id"]
         )
 
-        nested_facts = crop.get(
-            "facts",
-            [],
+        facts = get_usable_facts(
+            dict(knowledge),
+            crop_id=crop_id,
         )
-
-        if (
-            isinstance(
-                nested_facts,
-                list,
-            )
-            and nested_facts
-        ):
-            facts = list(
-                nested_facts
-            )
-
-        else:
-            facts = get_usable_facts(
-                dict(knowledge),
-                crop_id=crop_id,
-            )
 
         candidates.append(
             {

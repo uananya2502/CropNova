@@ -1,6 +1,7 @@
 import unittest
 
 from csp_solver import solve_constraints
+from constraint_definitions import SeasonConstraint
 
 
 def fact(fact_id, prop, value):
@@ -71,6 +72,37 @@ class TestCSPSolver(unittest.TestCase):
             "MISSING_USER_INPUT",
         )
         self.assertFalse(result["diagnostics"]["unknown_is_satisfied"])
+    
+    def test_wheat_rabi_season_uses_verified_fact(self):
+        from knowledge_base.loader import load_knowledge
+        from knowledge_base.retrieval import get_usable_facts
+
+        knowledge = load_knowledge()
+        facts = get_usable_facts(knowledge, crop_id="wheat")
+
+        candidate_record = {
+            "candidate_id": "wheat",
+            "name": "Wheat",
+        }
+
+        profile = {
+            "season": "rabi",
+            "region": {
+                "state": "Haryana",
+                "district": "Rewari",
+            },
+        }
+
+        result = SeasonConstraint().check(
+            candidate_record,
+            profile,
+            facts,
+        )
+
+        self.assertEqual(result.status.value, "satisfied")
+        self.assertIn("FACT_WHEAT_004", result.fact_ids)
+        self.assertIn("SRC_CCSHAU_RABI_SEED_001", result.source_ids)
+
 
     def test_unverified_fact_is_not_satisfied(self):
         item = candidate("A")
@@ -78,6 +110,59 @@ class TestCSPSolver(unittest.TestCase):
         result = solve_constraints([item], PROFILE)
         self.assertEqual(result["status"], "incomplete")
         self.assertEqual(result["feasible_candidates"], [])
+    
+    def test_numeric_wheat_water_range_returns_unknown_with_evidence(self):
+        from knowledge_base.loader import load_knowledge
+        from knowledge_base.retrieval import get_usable_facts
+        from constraint_definitions import WaterConstraint
+
+        knowledge = load_knowledge()
+        facts = get_usable_facts(knowledge, crop_id="wheat")
+
+        profile = {
+            "region": {"state": "Haryana", "district": "Rewari"},
+            "water": {"availability": "moderate"},
+        }
+
+        result = WaterConstraint().check(
+            {"candidate_id": "wheat", "name": "Wheat"},
+            profile,
+            facts,
+        )
+
+        self.assertEqual(result.status.value, "unknown")
+        self.assertEqual(result.reason_code, "INCOMPATIBLE_WATER_UNITS")
+        self.assertIn("FACT_WHEAT_001", result.fact_ids)
+        self.assertIn("SRC_FAO_WATER_001", result.source_ids)
+    
+    def test_missing_real_soil_evidence_returns_unknown(self):
+        from knowledge_base.loader import load_knowledge
+        from knowledge_base.retrieval import get_usable_facts
+        from constraint_definitions import (
+            SoilTextureConstraint,
+            SoilPHConstraint,
+        )
+
+        knowledge = load_knowledge()
+        facts = get_usable_facts(knowledge, crop_id="wheat")
+
+        candidate = {"candidate_id": "wheat", "name": "Wheat"}
+        profile = {
+            "region": {"state": "Haryana", "district": "Rewari"},
+            "soil": {"texture": "loamy", "ph": 7.0},
+        }
+
+        for constraint in (
+            SoilTextureConstraint(),
+            SoilPHConstraint(),
+        ):
+            with self.subTest(constraint=constraint.name):
+                result = constraint.check(candidate, profile, facts)
+
+                self.assertEqual(result.status.value, "unknown")
+                self.assertEqual(result.reason_code, "MISSING_VERIFIED_FACT")
+                self.assertEqual(result.fact_ids, ())
+                self.assertEqual(result.source_ids, ())
 
 
 if __name__ == "__main__":

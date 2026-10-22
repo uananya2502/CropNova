@@ -183,12 +183,14 @@ class WaterConstraint(HardConstraint):
 
     def check(self, candidate, profile, facts):
         available = _nested(profile, "water", "availability")
+
         if _is_unknown(available):
             return self._unknown(
                 "Water availability is needed to check this candidate.",
                 "MISSING_USER_INPUT",
                 ("water.availability",),
             )
+
         available_key = _normalise(available)
         if available_key not in self.LEVELS:
             return self._unknown(
@@ -196,29 +198,55 @@ class WaterConstraint(HardConstraint):
                 "UNSUPPORTED_USER_VALUE",
                 ("water.availability",),
             )
+
         matches = verified_facts(
             facts,
             {"water_requirement", "water_need", "minimum_water_availability", "water"},
             profile,
         )
+
         if not matches:
             return self._unknown(
                 "No applicable verified water-requirement fact is available for this candidate.",
                 "MISSING_VERIFIED_FACT",
             )
+
+        numeric_ranges = [
+            fact for fact in matches
+            if isinstance(fact.get("value"), Mapping)
+            and "min" in fact["value"]
+            and "max" in fact["value"]
+        ]
+
+        if numeric_ranges:
+            fact_ids, source_ids = _evidence(numeric_ranges)
+            return ConstraintOutcome(
+                self.constraint_id,
+                self.name,
+                CheckStatus.UNKNOWN,
+                "Crop water demand is numeric, but farm water availability is qualitative; these values cannot be compared reliably.",
+                "INCOMPATIBLE_WATER_UNITS",
+                fact_ids,
+                source_ids,
+            )
+
         requirements = {
             _normalise(fact.get("value"))
             for fact in matches
             if isinstance(fact.get("value"), str)
+            and _normalise(fact.get("value")) in self.LEVELS
         }
-        if len(requirements) != 1 or not requirements.issubset(self.LEVELS):
+
+        if len(requirements) != 1:
             return self._unknown(
-                "Verified water evidence is not expressed on the low/moderate/high scale required by this constraint.",
+                "No single compatible qualitative water requirement is available.",
                 "INCOMPATIBLE_VERIFIED_FACT",
             )
+
         required = requirements.pop()
-        passed = self.LEVELS[available_key] >= self.LEVELS[required]
         fact_ids, source_ids = _evidence(matches)
+        passed = self.LEVELS[available_key] >= self.LEVELS[required]
+
         return ConstraintOutcome(
             self.constraint_id,
             self.name,

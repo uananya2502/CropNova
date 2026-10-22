@@ -293,6 +293,49 @@ class TestAgent(unittest.TestCase):
             "RULE_WATER_001",
             rule_ids,
         )
+    
+    def test_candidate_records_excludes_unreviewed_nested_facts(self):
+        from agent import _candidate_records
+
+        knowledge = {
+            "crops": [
+                {
+                    "crop_id": "wheat",
+                    "common_name": "Wheat",
+                    "facts": [
+                        {
+                            "fact_id": "UNSAFE_FACT",
+                            "crop_id": "wheat",
+                            "category": "growing_season",
+                            "value": "rabi",
+                            "verification_status": "needs_review",
+                            "source_ids": ["UNREVIEWED_SOURCE"],
+                        }
+                    ],
+                }
+            ],
+            "facts": [
+                {
+                    "fact_id": "UNSAFE_FACT",
+                    "crop_id": "wheat",
+                    "category": "growing_season",
+                    "value": "rabi",
+                    "verification_status": "needs_review",
+                    "source_ids": ["UNREVIEWED_SOURCE"],
+                }
+            ],
+            "sources": [
+                {
+                    "source_id": "UNREVIEWED_SOURCE",
+                    "review_status": "pending_review",
+                }
+            ],
+        }
+
+        candidates = _candidate_records(knowledge)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["facts"], [])
 
 
 if __name__ == "__main__":

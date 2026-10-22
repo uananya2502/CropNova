@@ -1,0 +1,832 @@
+{
+  "metadata": {
+    "project": "CropNova",
+    "dataset_name": "CropNova Agricultural Knowledge Base Starter",
+    "version": "0.1.0",
+    "created_date": "2026-10-21",
+    "scope": "Starter knowledge for wheat, rice, maize and chickpea; India-oriented project with clearly marked general FAO references.",
+    "notice": "Not a complete agronomic advisory. Do not invent or infer local sowing dates, fertilizer doses, pesticide instructions, varieties or irrigation schedules.",
+    "status_definitions": {
+      "verified_general": "Source-backed general principle, not necessarily sufficient for farm-specific advice.",
+      "verified_context_specific": "Valid only within the stated context.",
+      "pending_research": "Placeholder; must not be used for recommendations or production rules.",
+      "needs_review": "Incomplete, stale or conflicting evidence."
+    }
+  },
+  "crops": [
+    {
+      "crop_id": "wheat",
+      "common_name": "Wheat",
+      "scientific_name": "Triticum aestivum",
+      "crop_group": "cereal",
+      "fact_ids": [
+        "FACT_WHEAT_001",
+        "FACT_WHEAT_002",
+        "FACT_WHEAT_003"
+      ],
+      "source_ids": [
+        "SRC_FAO_WATER_001",
+        "SRC_ICAR_IISS_001",
+        "SRC_ICAR_CROP_SCIENCE_001"
+      ],
+      "status": "active_prototype"
+    },
+    {
+      "crop_id": "rice",
+      "common_name": "Rice",
+      "scientific_name": "Oryza sativa",
+      "crop_group": "cereal",
+      "fact_ids": [
+        "FACT_RICE_001",
+        "FACT_RICE_002",
+        "FACT_RICE_003"
+      ],
+      "source_ids": [
+        "SRC_FAO_WATER_001",
+        "SRC_ICAR_CROP_SCIENCE_001",
+        "SRC_ICAR_PORTALS_001"
+      ],
+      "status": "active_prototype"
+    },
+    {
+      "crop_id": "maize",
+      "common_name": "Maize",
+      "scientific_name": "Zea mays",
+      "crop_group": "cereal",
+      "fact_ids": [
+        "FACT_MAIZE_001",
+        "FACT_MAIZE_002",
+        "FACT_MAIZE_003"
+      ],
+      "source_ids": [
+        "SRC_FAO_WATER_001",
+        "SRC_ICAR_CROP_SCIENCE_001",
+        "SRC_ICAR_PORTALS_001"
+      ],
+      "status": "active_prototype"
+    },
+    {
+      "crop_id": "chickpea",
+      "common_name": "Chickpea",
+      "scientific_name": "Cicer arietinum",
+      "crop_group": "pulse/legume",
+      "fact_ids": [
+        "FACT_CHICKPEA_001",
+        "FACT_CHICKPEA_002",
+        "FACT_CHICKPEA_003"
+      ],
+      "source_ids": [
+        "SRC_ICAR_IIPR_001",
+        "SRC_ICAR_CROP_SCIENCE_001"
+      ],
+      "status": "active_prototype"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "FACT_GENERAL_001",
+      "crop_id": "all",
+      "category": "water",
+      "statement": "Crop water needs depend on climate, crop type, and growth stage.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_002",
+      "crop_id": "all",
+      "category": "water",
+      "statement": "Hotter, drier, windier and sunnier conditions generally increase crop water needs.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Directional principle, not an irrigation prescription."
+    },
+    {
+      "fact_id": "FACT_GENERAL_003",
+      "crop_id": "all",
+      "category": "water",
+      "statement": "Crop-water need in the FAO reference is related to evapotranspiration under optimal growing conditions.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_004",
+      "crop_id": "all",
+      "category": "water",
+      "statement": "Broad crop-water ranges are not a substitute for local irrigation scheduling.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_005",
+      "crop_id": "all",
+      "category": "soil_health",
+      "statement": "Soil fertility and limitations should be assessed rather than assumed from crop name or location alone.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_SOIL_HEALTH_001",
+        "SRC_ICAR_IISS_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_006",
+      "crop_id": "all",
+      "category": "nutrients",
+      "statement": "Nutrient recommendations should be balanced and adapted to soil status and the crop/cropping system.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_IISS_001",
+        "SRC_ICAR_SOIL_HEALTH_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_007",
+      "crop_id": "all",
+      "category": "nutrients",
+      "statement": "Integrated nutrient management may combine inorganic and organic nutrient sources; the mix and rates depend on the applicable recommendation.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_IISS_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_GENERAL_008",
+      "crop_id": "all",
+      "category": "crop_selection",
+      "statement": "Crop varieties and production technologies need to match their agro-ecological suitability.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_CROP_SCIENCE_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_WHEAT_001",
+      "crop_id": "wheat",
+      "category": "water",
+      "statement": "FAO lists 450–650 mm as an indicative water-need range for barley/oats/wheat over the total growing period; it is not a local irrigation schedule.",
+      "value": {
+        "min": 450,
+        "max": 650
+      },
+      "unit": "mm per total growing period",
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "General FAO reference",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": "total growing period"
+      },
+      "confidence": "medium",
+      "notes": "Not India-specific; depends on climate and growing-period duration."
+    },
+    {
+      "fact_id": "FACT_WHEAT_002",
+      "crop_id": "wheat",
+      "category": "nutrients",
+      "statement": "ICAR-IISS describes wheat nutrient-management examples for specific soybean–wheat systems in parts of Madhya Pradesh; rates must not be generalized to all farms.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_IISS_001"
+      ],
+      "verification_status": "verified_context_specific",
+      "applicability": {
+        "country": "India",
+        "state": "Madhya Pradesh",
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Context-specific example for soybean-wheat systems in parts of Madhya Pradesh. Exact source region and conditions still require verification; do not use as a universal nutrient dose."
+    },
+    {
+      "fact_id": "FACT_WHEAT_003",
+      "crop_id": "wheat",
+      "category": "variety",
+      "statement": "Verify wheat variety suitability against current official recommendations for the target region.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_CROP_SCIENCE_001"
+      ],
+      "verification_status": "needs_review",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Research/process note, not a verified cultivation recommendation. Find a current official source with region and conditions before creating a recommendation or rule."
+    },
+    {
+      "fact_id": "FACT_RICE_001",
+      "crop_id": "rice",
+      "category": "water",
+      "statement": "FAO lists 450–700 mm as an indicative water-need range for paddy rice over the total growing period; it is not a local irrigation schedule.",
+      "value": {
+        "min": 450,
+        "max": 700
+      },
+      "unit": "mm per total growing period",
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "General FAO reference",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": "total growing period"
+      },
+      "confidence": "medium",
+      "notes": "Indicative reference; rice production systems differ."
+    },
+    {
+      "fact_id": "FACT_RICE_002",
+      "crop_id": "rice",
+      "category": "water",
+      "statement": "Rice water management requires production system, climate, soil, rainfall and growth-stage context.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001",
+        "SRC_ICAR_PORTALS_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_RICE_003",
+      "crop_id": "rice",
+      "category": "variety",
+      "statement": "Verify rice variety suitability and stress traits against current official regional recommendations.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_CROP_SCIENCE_001"
+      ],
+      "verification_status": "needs_review",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Research/process note, not a verified cultivation recommendation. Find a current official source with region and conditions before creating a recommendation or rule."
+    },
+    {
+      "fact_id": "FACT_MAIZE_001",
+      "crop_id": "maize",
+      "category": "water",
+      "statement": "FAO lists 500–800 mm as an indicative water-need range for grain maize over the total growing period; it is not a local irrigation schedule.",
+      "value": {
+        "min": 500,
+        "max": 800
+      },
+      "unit": "mm per total growing period",
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "General FAO reference",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": "total growing period"
+      },
+      "confidence": "medium",
+      "notes": "Actual need depends on climate and crop purpose."
+    },
+    {
+      "fact_id": "FACT_MAIZE_002",
+      "crop_id": "maize",
+      "category": "water",
+      "statement": "Maize water needs vary with climate and growth stage; one fixed value is insufficient for irrigation scheduling.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_FAO_WATER_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_MAIZE_003",
+      "crop_id": "maize",
+      "category": "variety",
+      "statement": "Verify maize hybrid/variety recommendations against current official sources and intended use.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_CROP_SCIENCE_001",
+        "SRC_ICAR_PORTALS_001"
+      ],
+      "verification_status": "needs_review",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Research/process note, not a verified cultivation recommendation. Find a current official source with region and conditions before creating a recommendation or rule."
+    },
+    {
+      "fact_id": "FACT_CHICKPEA_001",
+      "crop_id": "chickpea",
+      "category": "crop_management",
+      "statement": "ICAR-IIPR provides pulse crop-production technology resources; extract a matching current chickpea recommendation before creating rules.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_IIPR_001"
+      ],
+      "verification_status": "pending_research",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Source-navigation note only. Extract and review a specific, current chickpea recommendation before creating a rule."
+    },
+    {
+      "fact_id": "FACT_CHICKPEA_002",
+      "crop_id": "chickpea",
+      "category": "crop_rotation",
+      "statement": "Cropping-system recommendations must match the cited region, soil and management conditions.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_IIPR_001"
+      ],
+      "verification_status": "verified_general",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": ""
+    },
+    {
+      "fact_id": "FACT_CHICKPEA_003",
+      "crop_id": "chickpea",
+      "category": "variety",
+      "statement": "Select chickpea varieties using current official regional recommendations and relevant traits.",
+      "value": null,
+      "unit": null,
+      "source_ids": [
+        "SRC_ICAR_CROP_SCIENCE_001",
+        "SRC_ICAR_IIPR_001"
+      ],
+      "verification_status": "needs_review",
+      "applicability": {
+        "country": "India",
+        "state": null,
+        "district": null,
+        "soil_type": null,
+        "season": null,
+        "growth_stage": null
+      },
+      "confidence": "medium",
+      "notes": "Research/process note, not a verified cultivation recommendation. Find a current official source with region and conditions before creating a recommendation or rule."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "SRC_FAO_WATER_001",
+      "title": "FAO Crop Water Needs, Chapter 3",
+      "publisher": "FAO",
+      "url": "https://www.fao.org/4/S2022E/s2022e07.htm",
+      "topics": [
+        "water",
+        "climate",
+        "growth_stage"
+      ],
+      "scope": "General principles and indicative water ranges; not a local irrigation schedule.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_IISS_001",
+      "title": "Technologies to Enhance Soil Fertility through Input/Nutrient Management",
+      "publisher": "ICAR-Indian Institute of Soil Science",
+      "url": "https://www.iiss.res.in/rnd.php",
+      "topics": [
+        "soil",
+        "nutrients",
+        "cropping_systems"
+      ],
+      "scope": "Some recommendations are tied to particular regions and cropping systems; do not generalize rates.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_SOIL_HEALTH_001",
+      "title": "National Campaign on Soil Health Management",
+      "publisher": "ICAR",
+      "url": "https://www.icar.gov.in/en/national-campaign-soil-health-management-nutrient-use-efficiency-and-soc-management",
+      "topics": [
+        "soil_health",
+        "nutrient_use_efficiency"
+      ],
+      "scope": "General soil-health context; local fertilizer doses need relevant evidence.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_CROP_SCIENCE_001",
+      "title": "Crop Science",
+      "publisher": "ICAR",
+      "url": "https://www.icar.gov.in/en/crop-science/crop-science",
+      "topics": [
+        "varieties",
+        "agro_ecological_suitability"
+      ],
+      "scope": "Variety recommendations must be checked against current regional releases.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_PORTALS_001",
+      "title": "Technologies and Knowledge Resources",
+      "publisher": "ICAR",
+      "url": "https://icar.gov.in/en/technologies-and-knowledge-resources",
+      "topics": [
+        "wheat",
+        "rice",
+        "maize",
+        "expert_systems"
+      ],
+      "scope": "Resource directory; use linked specialist sources for detailed recommendations.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_IIPR_001",
+      "title": "Crop Production Technologies",
+      "publisher": "ICAR-Indian Institute of Pulses Research",
+      "url": "https://www.icar-iipr.org.in/crop-production-technologies/",
+      "topics": [
+        "pulses",
+        "chickpea",
+        "crop_rotation"
+      ],
+      "scope": "Match any recommendation to cited crop system, region, and trial conditions.",
+      "review_status": "reviewed_for_inclusion"
+    },
+    {
+      "source_id": "SRC_ICAR_COMPENDIUM_001",
+      "title": "Compendium of Agricultural Technologies",
+      "publisher": "ICAR",
+      "url": "https://icar.org.in/en/compendium-agricultural-technologies",
+      "topics": [
+        "crop_science",
+        "natural_resource_management"
+      ],
+      "scope": "Use individual technology references for specific facts.",
+      "review_status": "reviewed_for_inclusion"
+    }
+  ],
+  "pending_research": [
+    {
+      "research_id": "PENDING_WHEAT_REGIONAL_SOWING_WINDOW",
+      "crop_id": "wheat",
+      "topic": "regional_sowing_window",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_SOIL_TEST_BASED_NUTRIENTS",
+      "crop_id": "wheat",
+      "topic": "soil_test_based_nutrients",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_IRRIGATION_BY_GROWTH_STAGE",
+      "crop_id": "wheat",
+      "topic": "irrigation_by_growth_stage",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_LOCAL_VARIETIES",
+      "crop_id": "wheat",
+      "topic": "local_varieties",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_WHEAT_DISEASE_MANAGEMENT",
+      "crop_id": "wheat",
+      "topic": "disease_management",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_REGIONAL_SOWING_WINDOW",
+      "crop_id": "rice",
+      "topic": "regional_sowing_window",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_PRODUCTION_SYSTEM",
+      "crop_id": "rice",
+      "topic": "production_system",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_SOIL_TEST_BASED_NUTRIENTS",
+      "crop_id": "rice",
+      "topic": "soil_test_based_nutrients",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_WATER_MANAGEMENT",
+      "crop_id": "rice",
+      "topic": "water_management",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_LOCAL_VARIETIES",
+      "crop_id": "rice",
+      "topic": "local_varieties",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_RICE_DISEASE_MANAGEMENT",
+      "crop_id": "rice",
+      "topic": "disease_management",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_REGIONAL_SOWING_WINDOW",
+      "crop_id": "maize",
+      "topic": "regional_sowing_window",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_GRAIN_OR_FODDER_PURPOSE",
+      "crop_id": "maize",
+      "topic": "grain_or_fodder_purpose",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_SOIL_TEST_BASED_NUTRIENTS",
+      "crop_id": "maize",
+      "topic": "soil_test_based_nutrients",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_IRRIGATION_BY_GROWTH_STAGE",
+      "crop_id": "maize",
+      "topic": "irrigation_by_growth_stage",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_LOCAL_HYBRIDS",
+      "crop_id": "maize",
+      "topic": "local_hybrids",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_MAIZE_DISEASE_MANAGEMENT",
+      "crop_id": "maize",
+      "topic": "disease_management",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_REGIONAL_SOWING_WINDOW",
+      "crop_id": "chickpea",
+      "topic": "regional_sowing_window",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_SOIL_AND_DRAINAGE",
+      "crop_id": "chickpea",
+      "topic": "soil_and_drainage",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_SOIL_TEST_BASED_NUTRIENTS",
+      "crop_id": "chickpea",
+      "topic": "soil_test_based_nutrients",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_WATER_STRESS_STAGES",
+      "crop_id": "chickpea",
+      "topic": "water_stress_stages",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_LOCAL_VARIETIES",
+      "crop_id": "chickpea",
+      "topic": "local_varieties",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    },
+    {
+      "research_id": "PENDING_CHICKPEA_DISEASE_MANAGEMENT",
+      "crop_id": "chickpea",
+      "topic": "disease_management",
+      "status": "pending_research",
+      "required_evidence": "Current official ICAR/state agricultural university/KVK source, date/version, region and page/section.",
+      "rule_creation_allowed": false
+    }
+  ],
+  "cropnova_policies": [
+    {
+      "policy_id": "FACT_GENERAL_009",
+      "statement": "When required details or applicable evidence are missing, ask for information or mark the assessment undetermined.",
+      "category": "uncertainty",
+      "notes": "CropNova safety policy informed by source limitations."
+    },
+    {
+      "policy_id": "FACT_GENERAL_010",
+      "statement": "Every CropNova recommendation should retain supporting fact IDs and source IDs.",
+      "category": "traceability",
+      "notes": "Engineering requirement."
+    }
+  ]
+}
