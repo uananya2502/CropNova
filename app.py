@@ -1,191 +1,371 @@
-"""Dependency-free browser interface for the CropNova prototype.
+"""CropNova's public website and download routes.
 
-Run ``python app.py`` and open http://127.0.0.1:8000.
+The assessment engine, page templates, private report storage and PDF renderer
+live in separate small modules. Run `python app.py` to start the local website.
 """
-
-from __future__ import annotations
 
 import json
-from html import escape
-from typing import Any, Iterable, Mapping
+import math
+import os
+from pathlib import Path
+from socketserver import ThreadingMixIn
 from urllib.parse import parse_qs
-from wsgiref.simple_server import make_server
+from wsgiref.simple_server import make_server, WSGIServer
 
 from agent import run_assessment
-from knowledge_base.loader import load_knowledge
+from genai_explainer import generate_explanation
+from public_profiles import REFERENCE_PROFILES
+from form_choices import submitted_crops, public_options
+from report_store import save_report, load_report
+from web_views import message_page, genai_panel  # Compatibility export for integrations.
+from public_pages import home_page, assessment_page, how_it_works_page, sources_page, privacy_page
+from assessment_pages import saved_page
+
+ROOT = Path(__file__).resolve().parent
+STATIC_FILES = {
+    "/static/field-morning.webp": ("field-morning.webp", "image/webp"),
+    "/static/botanical-paper.webp": ("botanical-paper.webp", "image/webp"),
+    "/static/harvest-banner.webp": ("harvest-banner.webp", "image/webp"),
+    "/static/design.css": ("design.css", "text/css; charset=utf-8"),
+    "/static/style.css": ("style.css", "text/css; charset=utf-8"),
+    "/static/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/static/fields.svg": ("fields.svg", "image/svg+xml"),
+    "/static/icon.svg": ("icon.svg", "image/svg+xml"),
+}
 
 
-CSS = """
-:root{--ink:#19352c;--muted:#61756d;--paper:#fbfcf7;--cream:#f2f0e4;--leaf:#2e6b4e;--lime:#c8e26b;--rust:#b95d3f;--gold:#dda93d;--line:#dce4db}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
-header{background:var(--ink);color:white;padding:1rem 0}nav,main,.hero-inner{max-width:1120px;margin:auto;padding-left:1.25rem;padding-right:1.25rem}nav{display:flex;align-items:center;justify-content:space-between}.brand{font:800 1.25rem Georgia,serif;letter-spacing:.02em}.tag{font-size:.78rem;padding:.35rem .65rem;border:1px solid #ffffff55;border-radius:99px}
-.hero{background:linear-gradient(125deg,var(--ink),#326c4f);color:white;padding:3.4rem 0 4.5rem}.hero-inner{display:grid;grid-template-columns:1.35fr .65fr;gap:2.5rem;align-items:end}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-size:.74rem;font-weight:800}.hero h1{font:700 clamp(2.6rem,6vw,5rem)/.96 Georgia,serif;margin:.5rem 0 1rem;max-width:760px}.hero p{max-width:680px;color:#e3ebe7;font-size:1.05rem}.hero-note{border-left:3px solid var(--lime);padding-left:1rem;color:#d5e0da;font-size:.9rem}
-main{margin-top:-2rem;padding-bottom:4rem}.panel{background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #18352c12;padding:clamp(1.2rem,3vw,2.2rem);margin-bottom:1.25rem}.panel h2{font:700 1.65rem Georgia,serif;margin:0 0 .4rem}.intro{color:var(--muted);margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 1.25rem}.field label,.label{display:block;font-size:.8rem;font-weight:800;letter-spacing:.035em;margin-bottom:.35rem}.field small{display:block;color:var(--muted);margin-top:.25rem}input,select{width:100%;font:inherit;color:var(--ink);padding:.75rem .8rem;border:1px solid #becbc3;border-radius:9px;background:#fff}input:focus,select:focus{outline:3px solid #c8e26b66;border-color:var(--leaf)}fieldset{border:0;padding:0;margin:1.3rem 0}.checks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}.check{display:flex;align-items:center;gap:.55rem;border:1px solid var(--line);border-radius:9px;padding:.65rem .7rem}.check input{width:auto}.actions{display:flex;align-items:center;gap:1rem;margin-top:1.4rem}.button{border:0;border-radius:10px;background:var(--leaf);color:white;font-weight:800;padding:.85rem 1.2rem;cursor:pointer}.button:hover{background:#23543d}.privacy{color:var(--muted);font-size:.8rem}
-.status{display:flex;gap:1rem;align-items:flex-start}.status-mark{width:12px;height:12px;border-radius:50%;background:var(--gold);margin-top:.45rem;box-shadow:0 0 0 6px #dda93d1e}.status.good .status-mark{background:var(--leaf)}.status.bad .status-mark{background:var(--rust)}.status h2{margin:0}.status-code{font-size:.72rem;font-weight:900;letter-spacing:.08em;color:var(--muted)}.columns{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}.candidate{border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.7rem 0}.candidate h3{display:flex;justify-content:space-between;gap:.5rem;margin:0 0 .55rem;font-size:1rem}.pill{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .5rem;border-radius:99px;background:var(--cream)}.pill.feasible{background:#dff1e5;color:#1f6241}.pill.rejected{background:#f9e4dd;color:#873c27}.pill.unknown{background:#f5edcf;color:#755d16}.trace{font-size:.84rem;color:var(--muted);padding:.45rem 0;border-top:1px solid #edf0ed}.trace strong{color:var(--ink)}ul.clean{padding-left:1.1rem;margin-bottom:0}.warning{background:#fff8e2;border-left:4px solid var(--gold);padding:.8rem 1rem;border-radius:5px;margin:.55rem 0}.error{background:#fcebe7;border-left-color:var(--rust)}details{margin-top:1rem}pre{background:#12271f;color:#dce9e1;padding:1rem;border-radius:10px;overflow:auto;font-size:.75rem}.footnote{font-size:.8rem;color:var(--muted);margin-top:1rem}
-@media(max-width:760px){.hero-inner,.grid,.columns{grid-template-columns:1fr}.checks{grid-template-columns:repeat(2,1fr)}.hero{padding-top:2.3rem}.hero-note{display:none}}
-"""
+class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
+    """An AI request or spare browser connection must not block other pages."""
+
+    daemon_threads = True
+
+    def get_request(self):
+        connection, address = super().get_request()
+        connection.settimeout(10)
+        return connection, address
 
 
-def _page(content: str) -> bytes:
-    html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CropNova</title><style>{CSS}</style></head><body>
-    <header><nav><div class="brand">CropNova</div><div class="tag">Explainable AI prototype</div></nav></header>
-    <section class="hero"><div class="hero-inner"><div><div class="eyebrow">Evidence before answers</div><h1>Find what fits. See every reason.</h1><p>CropNova checks candidate crops against explicit season, water, soil-texture and pH constraints. Unknown information stays unknown.</p></div><div class="hero-note">The symbolic pipeline decides outcomes. Explanations communicate the trace without changing it.</div></div></section>
-    <main>{content}</main></body></html>"""
-    return html.encode("utf-8")
+def create_server(host="127.0.0.1", port=8000):
+    return make_server(host, port, application, server_class=ThreadedWSGIServer)
 
 
-def _options(values: Iterable[tuple[str, str]], selected: str = "") -> str:
-    return "".join(
-        f'<option value="{escape(value)}"{" selected" if value == selected else ""}>{escape(label)}</option>'
-        for value, label in values
+def respond(
+    start_response, body, status="200 OK", content_type="text/html; charset=utf-8", extra=()
+):
+    headers = [
+        ("Content-Type", content_type),
+        ("Content-Length", str(len(body))),
+        ("X-Content-Type-Options", "nosniff"),
+        ("Referrer-Policy", "no-referrer"),
+        ("Cache-Control", "no-store"),
+        ("X-Frame-Options", "DENY"),
+        (
+            "Content-Security-Policy",
+            "default-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+        ),
+    ]
+    headers.extend(extra)
+    start_response(status, headers)
+    return [body]
+
+
+def assess(values):
+    """Public requests always use published knowledge, never classroom fixtures."""
+    values = {**values, "mode": "real"}
+    report = run_assessment(values)
+    report["mode"] = "real"
+    profile = report.setdefault("profile", {})
+    profile["mode"] = "real"
+    profile["use_genai"] = "yes" if values.get("use_genai") == "yes" else "no"
+    for group, field in [("soil", "ph"), ("water", "budget_mm"), ("rainfall", "mm")]:
+        measurement = profile.get(group, {}).get(field)
+        if isinstance(measurement, float) and not math.isfinite(measurement):
+            profile[group][field] = None
+    report["generative_ai"] = generate_explanation(
+        report, requested=values.get("use_genai") == "yes"
     )
+    return report
 
 
-def _form(crops: list[Mapping[str, Any]], values: Mapping[str, Any] | None = None) -> str:
-    values = values or {}
-    region = values.get("region", {}) if isinstance(values.get("region"), Mapping) else {}
-    soil = values.get("soil", {}) if isinstance(values.get("soil"), Mapping) else {}
-    water = values.get("water", {}) if isinstance(values.get("water"), Mapping) else {}
-    form_values = {
-        **values,
-        "state": region.get("state", values.get("state", "")),
-        "district": region.get("district", values.get("district", "")) or "",
-        "soil_texture": soil.get("texture", values.get("soil_texture", "unknown")),
-        "soil_ph": soil.get("ph", values.get("soil_ph", "")) if soil.get("ph", values.get("soil_ph")) is not None else "",
-        "soil_fertility": soil.get("fertility", values.get("soil_fertility", "unknown")),
-        "water_availability": water.get("availability", values.get("water_availability", "unknown")),
-        "irrigation": water.get("irrigation", values.get("irrigation", "unknown")),
-    }
-    selected = set(form_values.get("candidate_ids", []))
-    crop_checks = "".join(
-        f'<label class="check"><input type="checkbox" name="candidate_ids" value="{escape(str(crop.get("crop_id")))}"{" checked" if crop.get("crop_id") in selected else ""}> {escape(str(crop.get("common_name", crop.get("name", crop.get("crop_id", "")))).title())}</label>'
-        for crop in crops
-    )
-    enum = {
-        "season": [("unknown", "I don't know"), ("kharif", "Kharif"), ("rabi", "Rabi"), ("zaid", "Zaid")],
-        "texture": [("unknown", "I don't know"), ("sandy", "Sandy"), ("loamy", "Loamy"), ("clayey", "Clayey"), ("other", "Other")],
-        "level": [("unknown", "I don't know"), ("low", "Low"), ("moderate", "Moderate"), ("high", "High")],
-        "irrigation": [("unknown", "I don't know"), ("available", "Available"), ("rainfed", "Rainfed"), ("limited", "Limited")],
-    }
-    return f"""<section class="panel"><h2>Farm profile</h2><p class="intro">Required fields are marked. Measurements can remain unknown.</p>
-    <form method="post" action="/assess"><div class="grid">
-      <div class="field"><label for="state">State / region *</label><input id="state" name="state" required maxlength="80" value="{escape(str(form_values.get('state','')))}" placeholder="e.g. your state"></div>
-      <div class="field"><label for="district">District / town</label><input id="district" name="district" maxlength="80" value="{escape(str(form_values.get('district','')))}" placeholder="Optional"></div>
-      <div class="field"><label for="season">Growing season</label><select id="season" name="season">{_options(enum['season'],str(form_values.get('season','unknown')))}</select></div>
-      <div class="field"><label for="water_availability">Water availability</label><select id="water_availability" name="water_availability">{_options(enum['level'],str(form_values.get('water_availability','unknown')))}</select></div>
-      <div class="field"><label for="soil_texture">Soil texture</label><select id="soil_texture" name="soil_texture">{_options(enum['texture'],str(form_values.get('soil_texture','unknown')))}</select></div>
-      <div class="field"><label for="soil_ph">Measured soil pH</label><input id="soil_ph" name="soil_ph" type="number" min="0" max="14" step="0.1" value="{escape(str(form_values.get('soil_ph','')))}" placeholder="Unknown"><small>Compared only with verified ranges.</small></div>
-      <div class="field"><label for="soil_fertility">Soil fertility</label><select id="soil_fertility" name="soil_fertility">{_options(enum['level'],str(form_values.get('soil_fertility','unknown')))}</select></div>
-      <div class="field"><label for="irrigation">Irrigation access</label><select id="irrigation" name="irrigation">{_options(enum['irrigation'],str(form_values.get('irrigation','unknown')))}</select></div>
-      <div class="field"><label for="objective">Objective *</label><select id="objective" name="objective">{_options([('find_suitable_crop','Find a suitable crop'),('conserve_water','Conserve water'),('soil_improvement','Soil improvement'),('compare_alternatives','Compare alternatives')],str(form_values.get('objective','find_suitable_crop')))}</select></div>
-      <div class="field"><label for="priority">Priority</label><select id="priority" name="priority">{_options([('','No preference'),('water','Water'),('soil-season','Soil and season'),('resources','Resources'),('compare','Compare')],str(form_values.get('priority','') or ''))}</select></div>
-    </div><fieldset><legend class="label">Candidates to compare</legend><div class="checks">{crop_checks}</div><small class="privacy">Leave all unchecked to consider every knowledge-base crop.</small></fieldset>
-    <div class="actions"><button class="button" type="submit">Run transparent assessment</button><span class="privacy">No name, phone number, or exact address is collected.</span></div></form></section>"""
+class BodyTooLarge(ValueError):
+    """A separate exception lets the route return HTTP 413, not a server error."""
 
 
-def _constraint_rows(candidate: Mapping[str, Any]) -> str:
-    rows = []
-    for key, label in (
-        ("satisfied_constraints", "Passed"),
-        ("failed_constraints", "Failed"),
-        ("unknown_constraints", "Unknown"),
-    ):
-        for item in candidate.get(key, []):
-            ids = ", ".join(item.get("fact_ids", [])) or "no verified fact ID"
-            rows.append(
-                f'<div class="trace"><strong>{escape(label)} · {escape(str(item.get("constraint_id","")))}</strong><br>{escape(str(item.get("reason","")))}<br><small>Evidence: {escape(ids)}</small></div>'
-            )
-    return "".join(rows)
-
-
-def _candidate_cards(candidates: Iterable[Mapping[str, Any]], empty: str) -> str:
-    cards = []
-    for candidate in candidates:
-        status = str(candidate.get("status", "unknown"))
-        identity = " · ".join(
-            str(value).title() if key == "category" else str(value)
-            for key, value in (
-                ("category", candidate.get("category")),
-                ("scientific_name", candidate.get("scientific_name")),
-            )
-            if value
-        )
-        cards.append(
-            f'<article class="candidate"><h3>{escape(str(candidate.get("name", candidate.get("candidate_id"))).title())}<span class="pill {escape(status)}">{escape(status)}</span></h3>'
-            f'{f"<p class=\"intro\">{escape(identity)}</p>" if identity else ""}{_constraint_rows(candidate)}</article>'
-        )
-    return "".join(cards) or f'<p class="intro">{escape(empty)}</p>'
-
-
-def _list(items: Iterable[str]) -> str:
-    return "<ul class=" + '"clean">' + "".join(f"<li>{escape(str(item))}</li>" for item in items) + "</ul>"
-
-
-def _results(report: Mapping[str, Any]) -> str:
-    status = str(report.get("status", "SYSTEM_ERROR"))
-    mood = "good" if status == "FEASIBLE_OPTIONS_FOUND" else "bad" if status in {"NO_FEASIBLE_OPTION", "INVALID_INPUT", "SYSTEM_ERROR"} else ""
-    summary = next((item.get("text") for item in report.get("explanations", []) if item.get("type") == "assessment"), "Assessment could not be completed.")
-    alerts = "".join(f'<div class="warning">{escape(str(item))}</div>' for item in report.get("warnings", []))
-    alerts += "".join(f'<div class="warning error">{escape(str(item.get("message", item)))}</div>' for item in report.get("errors", []))
-    questions = report.get("follow_up_questions", [])
-    if questions:
-        alerts += '<div class="warning"><strong>Helpful follow-up</strong>' + _list(questions) + "</div>"
-    csp = report.get("csp_result", {})
-    knowledge = report.get("knowledge_summary", {})
-    sources = report.get("evidence", [])
-    source_html = "".join(
-        f'<div class="trace"><strong>{escape(str(item.get("source_id", "Source")))}</strong><br>{escape(str(item.get("title", item.get("organization", "Verified source"))))}</div>'
-        for item in sources
-    ) or '<p class="intro">No verified source was used in this assessment.</p>'
-    raw = escape(json.dumps(report.get("evidence_package", {}), indent=2, ensure_ascii=False))
-    return f"""<section class="panel"><div class="status {mood}"><span class="status-mark"></span><div><div class="status-code">{escape(status)}</div><h2>Assessment result</h2><p>{escape(str(summary))}</p></div></div>{alerts}</section>
-    <section class="columns"><div class="panel"><h2>Feasible options</h2>{_candidate_cards(csp.get('feasible_candidates',[]),'No option has passed every hard constraint.')}</div>
-    <div class="panel"><h2>Rejected options</h2>{_candidate_cards(csp.get('rejected_candidates',[]),'No candidate was definitively rejected.')}</div></section>
-    <section class="panel"><h2>Unknown / needs review</h2><p class="intro">These options are neither passed nor rejected. Missing input or verified knowledge prevents a decision.</p>{_candidate_cards(csp.get('unknown_candidates',[]),'No unresolved candidates.')}</section>
-    <section class="columns"><div class="panel"><h2>Trace & diagnostics</h2><p>Knowledge version: <strong>{escape(str(report.get('knowledge_version','unknown')))}</strong></p><p>Knowledge records: <strong>{escape(str(knowledge.get('total_crops',0)))} crops · {escape(str(knowledge.get('usable_facts',0)))} usable facts · {escape(str(knowledge.get('total_sources',0)))} sources</strong></p><p>Dataset status: <strong>{escape(str(knowledge.get('dataset_status','unknown')))}</strong></p><p>Rule adapter: <strong>{escape(str(report.get('rule_status','not run')))}</strong></p><p>Assignments examined: <strong>{escape(str(csp.get('diagnostics',{}).get('assignments_examined',0)))}</strong></p><p>Unknown treated as satisfied: <strong>No</strong></p><details><summary>Structured evidence package</summary><pre>{raw}</pre></details></div>
-    <div class="panel"><h2>Evidence used</h2>{source_html}<h2>Limitations & next step</h2>{_list(report.get('limitations',[]))}<p class="footnote">Update the form when more information becomes available and run the same deterministic pipeline again.</p></div></section>
-    {_form(_crops(), report.get('profile',{}))}"""
-
-
-def _crops() -> list[Mapping[str, Any]]:
+def read_body(environ, limit=100_000):
+    """Bound the body, require its declared size and decode strict UTF-8."""
     try:
-        return list(load_knowledge().get("crops", []))
-    except Exception:
-        return []
+        length = int(environ.get("CONTENT_LENGTH") or 0)
+    except (ValueError, TypeError):
+        raise ValueError("Invalid submission size.") from None
+    if length < 0:
+        raise ValueError("Invalid submission size.")
+    if length > limit:
+        raise BodyTooLarge("Submission exceeds the size limit.")
+    body = environ["wsgi.input"].read(length)
+    if len(body) != length:
+        raise ValueError("The submission was incomplete. Please try again.")
+    return body.decode("utf-8")
+
+
+def answer_request(environ, start_response, path):
+    """Read a question only after checking its private report link."""
+    from assessment_questions import cached_answer
+
+    def question_response(value, status="200 OK"):
+        return respond(
+            start_response,
+            json.dumps(value, ensure_ascii=False).encode(),
+            status=status,
+            content_type="application/json; charset=utf-8",
+        )
+
+    token = path[len("/assessment/") : -len("/ask")]
+    report = load_report(token)
+    if not report:
+        return question_response(
+            {"answer": "This report link has expired. Run a new assessment.", "evidence": []},
+            "404 Not Found",
+        )
+    try:
+        values = json.loads(read_body(environ, limit=5000))
+        if not isinstance(values, dict):
+            raise ValueError("Please submit a question.")
+        result = cached_answer(token, report, values.get("question"), values.get("crop_id", ""))
+    except BodyTooLarge:
+        return question_response(
+            {"answer": "Please submit a shorter question.", "evidence": []}, "413 Payload Too Large"
+        )
+    except (ValueError, UnicodeDecodeError) as error:
+        # Parser error text can echo submitted data; show only a friendly message.
+        message = (
+            "Please submit a valid question."
+            if isinstance(error, (json.JSONDecodeError, UnicodeDecodeError))
+            else str(error)
+        )
+        return question_response({"answer": message, "evidence": []}, "400 Bad Request")
+    return question_response(
+        result, "429 Too Many Requests" if result.get("status") == "busy" else "200 OK"
+    )
+
+
+def assessment_request(environ, start_response, path):
+    """Validate form data, assess once, and save the exact result for reuse."""
+    try:
+        parsed = parse_qs(read_body(environ), keep_blank_values=True, max_num_fields=60)
+    except BodyTooLarge:
+        return respond(
+            start_response,
+            message_page("That submission is too large", "Please use a shorter farm profile."),
+            status="413 Payload Too Large",
+        )
+    except (ValueError, UnicodeDecodeError):
+        return respond(
+            start_response,
+            message_page(
+                "Please check your submission",
+                "Return to the form and enter your field details again.",
+            ),
+            status="400 Bad Request",
+        )
+    values = {key: items[-1] for key, items in parsed.items()}
+    values["candidate_ids"] = submitted_crops(parsed.get("candidate_ids", []))
+    report = assess(values)
+    if path == "/report":
+        # Retained as a machine-readable integration endpoint; the product
+        # offers a personalised PDF rather than internal diagnostic output.
+        body = json.dumps(report, ensure_ascii=False, allow_nan=False).encode("utf-8")
+        return respond(start_response, body, content_type="application/json; charset=utf-8")
+    if report["status"] == "INVALID_INPUT":
+        return respond(
+            start_response,
+            assessment_page(values, errors=report.get("errors", [])),
+            status="422 Unprocessable Entity",
+        )
+    if report["status"] == "SYSTEM_ERROR":
+        return respond(
+            start_response,
+            message_page(
+                "We could not finish this assessment",
+                "Please try again shortly. Your field details have not been saved.",
+            ),
+            status="500 Internal Server Error",
+        )
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    report["created_at"] = datetime.now(ZoneInfo("Asia/Kolkata")).isoformat()
+    token = save_report(report)
+    # A redirect avoids resubmitting the form and calling the provider again
+    # when the user refreshes the results page.
+    return respond(
+        start_response, b"", status="303 See Other", extra=[("Location", "/assessment/" + token)]
+    )
 
 
 def application(environ, start_response):
     method = environ.get("REQUEST_METHOD", "GET").upper()
+    if method == "HEAD":
+        # Preserve GET headers (including length) while omitting the response body.
+        application({**environ, "REQUEST_METHOD": "GET"}, start_response)
+        return [b""]
     path = environ.get("PATH_INFO", "/")
+    if method == "GET" and path in STATIC_FILES:
+        filename, content_type = STATIC_FILES[path]
+        return respond(
+            start_response, (ROOT / "static" / filename).read_bytes(), content_type=content_type
+        )
+    if method == "GET" and path == "/robots.txt":
+        return respond(
+            start_response,
+            b"User-agent: *\nDisallow: /assessment/\nDisallow: /reports/\nDisallow: /ready\n",
+            content_type="text/plain; charset=utf-8",
+        )
+    if method == "GET" and path == "/form-options":
+        return respond(
+            start_response,
+            json.dumps(public_options()).encode(),
+            content_type="application/json; charset=utf-8",
+        )
+    if method == "GET" and path == "/health":
+        return respond(start_response, b'{"status":"ok"}', content_type="application/json")
+    if method == "GET" and path == "/ready":
+        from deployment_checks import readiness
+
+        result = readiness()
+        return respond(
+            start_response,
+            json.dumps(result).encode(),
+            status="200 OK" if result["status"] == "ready" else "503 Service Unavailable",
+            content_type="application/json",
+        )
     if method == "GET" and path == "/":
-        body = _page(_form(_crops()))
-        status = "200 OK"
-    elif method == "POST" and path == "/assess":
+        preset = parse_qs(environ.get("QUERY_STRING", "")).get("preset", [""])[0]
+        if preset in REFERENCE_PROFILES:
+            return respond(
+                start_response,
+                b"",
+                status="302 Found",
+                extra=[("Location", "/assess?preset=" + preset)],
+            )
+        return respond(start_response, home_page())
+    if method == "GET" and path == "/assess":
+        preset = parse_qs(environ.get("QUERY_STRING", "")).get("preset", [""])[0]
+        return respond(start_response, assessment_page(REFERENCE_PROFILES.get(preset)))
+    public_pages = {
+        "/how-it-works": how_it_works_page,
+        "/sources": sources_page,
+        "/privacy": privacy_page,
+    }
+    if method == "GET" and path in public_pages:
+        return respond(start_response, public_pages[path]())
+    if method == "POST" and path == "/coverage-preview":
+        from coverage_preview import preview_coverage
+
         try:
-            length = min(int(environ.get("CONTENT_LENGTH") or 0), 100_000)
-        except ValueError:
-            length = 0
-        parsed = parse_qs(environ["wsgi.input"].read(length).decode("utf-8"), keep_blank_values=True)
-        values: dict[str, Any] = {key: items[-1] for key, items in parsed.items()}
-        values["candidate_ids"] = parsed.get("candidate_ids", [])
-        report = run_assessment(values)
-        body = _page(_results(report))
-        status = "200 OK" if report.get("status") != "SYSTEM_ERROR" else "500 Internal Server Error"
-    else:
-        body = _page('<section class="panel"><h2>Page not found</h2><p><a href="/">Return to CropNova</a></p></section>')
-        status = "404 Not Found"
-    start_response(status, [("Content-Type", "text/html; charset=utf-8"), ("Content-Length", str(len(body)))])
-    return [body]
+            parsed = parse_qs(
+                read_body(environ, limit=20_000), keep_blank_values=True, max_num_fields=60
+            )
+            values = {key: items[-1] for key, items in parsed.items()}
+            values["candidate_ids"] = submitted_crops(parsed.get("candidate_ids", []))
+            result = preview_coverage(values)
+        except BodyTooLarge:
+            return respond(
+                start_response,
+                b'{"title":"Submission is too large"}',
+                status="413 Payload Too Large",
+                content_type="application/json",
+            )
+        except (ValueError, UnicodeDecodeError):
+            return respond(
+                start_response,
+                b'{"title":"Please check the selected values"}',
+                status="400 Bad Request",
+                content_type="application/json",
+            )
+        return respond(
+            start_response,
+            json.dumps(result, ensure_ascii=False, allow_nan=False).encode(),
+            content_type="application/json; charset=utf-8",
+        )
+    if method == "POST" and path.startswith("/assessment/") and path.endswith("/ask"):
+        return answer_request(environ, start_response, path)
+    if method == "GET" and path.startswith("/assessment/"):
+        parts = path.strip("/").split("/")
+        view = parts[2] if len(parts) == 3 else "results"
+        if len(parts) not in {2, 3} or view not in {"results", "report", "plan", "edit", "market"}:
+            return respond(
+                start_response,
+                message_page("We could not find that page", "Start a new assessment to continue."),
+                status="404 Not Found",
+            )
+        token = parts[1]
+        report = load_report(token)
+        if report:
+            market_selection = ""
+            if view == "market":
+                query = environ.get("QUERY_STRING", "")[:1024]
+                market_selection = parse_qs(query).get("series", [""])[0]
+            body = (
+                assessment_page(report.get("profile"), editing=True)
+                if view == "edit"
+                else saved_page(report, token, view, market_selection)
+            )
+            return respond(
+                start_response, body, extra=[("X-Robots-Tag", "noindex, nofollow, noarchive")]
+            )
+        return respond(
+            start_response,
+            message_page(
+                "This report link has expired",
+                "Saved assessments are available for one hour. Start a new assessment to see current findings.",
+            ),
+            status="404 Not Found",
+        )
+    if method == "GET" and path.startswith("/reports/") and path.endswith(".pdf"):
+        token = path.removeprefix("/reports/")[:-4]
+        report = load_report(token)
+        if not report:
+            return respond(
+                start_response,
+                message_page(
+                    "This report is no longer available",
+                    "Run a new assessment to create a fresh report.",
+                ),
+                status="404 Not Found",
+            )
+        from assessment_pdf import create_pdf
+
+        pdf = create_pdf(report, reference=token)
+        return respond(
+            start_response,
+            pdf,
+            content_type="application/pdf",
+            extra=[
+                ("Content-Disposition", 'attachment; filename="CropNova-Farm-Assessment.pdf"'),
+                ("X-Robots-Tag", "noindex, nofollow, noarchive"),
+            ],
+        )
+    if method == "POST" and path in {"/assess", "/report"}:
+        return assessment_request(environ, start_response, path)
+    return respond(
+        start_response,
+        message_page(
+            "We could not find that page", "Start a new field assessment from the home page."
+        ),
+        status="404 Not Found",
+    )
 
 
 def create_app():
-    """Return the WSGI application for servers and tests."""
-
     return application
 
 
 if __name__ == "__main__":
-    host, port = "127.0.0.1", 8000
+    from local_settings import load_local_settings
+
+    load_local_settings()
+    host = os.environ.get("HOST", "0.0.0.0" if "PORT" in os.environ else "127.0.0.1")
+    port = int(os.environ.get("PORT", "8000"))
     print(f"CropNova is running at http://{host}:{port}")
-    with make_server(host, port, application) as server:
+    with create_server(host, port) as server:
         server.serve_forever()

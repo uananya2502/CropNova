@@ -1,0 +1,28 @@
+{
+  "status": "Literature candidates for later full review; no final academic report or comparison table is claimed.",
+  "review_depth": "Publisher-indexed titles/abstracts were available; direct full-page retrieval returned 403. Findings and performance claims have not been independently verified.",
+  "candidates": [
+    {
+      "title": "Enhancing Transparency in Smart Farming: Local Explanations for Crop Recommendations Using LIME",
+      "year": 2025,
+      "url": "https://www.sciencedirect.com/science/article/pii/S1877050925015534",
+      "doi": "10.1016/j.procs.2025.04.450",
+      "relevance": "Compare post-hoc explanations of predicted crop classes with explicit source-linked condition checks.",
+      "review_status": "full_paper_review_pending"
+    },
+    {
+      "title": "An approach for crop recommendation with uncertainty quantification based on machine learning for sustainable agricultural decision-making",
+      "year": 2025,
+      "url": "https://www.sciencedirect.com/science/article/pii/S2590123025015750",
+      "relevance": "Compare uncertainty in supervised crop prediction with explicit unresolved evidence and fuzzy alignment.",
+      "review_status": "full_paper_review_pending"
+    },
+    {
+      "title": "An explainable hybrid fuzzy-machine learning framework for multi-crop suitability classification using agro-environmental data",
+      "year": null,
+      "url": "https://www.sciencedirect.com/science/article/pii/S0950705125020465",
+      "relevance": "Related hybrid fuzzy/crop-suitability research. Verify publication date, methods and evaluation from the paper before citing.",
+      "review_status": "bibliography_and_full_paper_review_pending"
+    }
+  ]
+}

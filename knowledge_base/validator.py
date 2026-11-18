@@ -1,4 +1,5 @@
 from typing import Any
+from evidence import numeric_range
 
 
 ALLOWED_STATUSES = {
@@ -106,13 +107,17 @@ def validate_knowledge(data: dict[str, Any]) -> list[str]:
         if not isinstance(fact.get("statement"), str) or not fact["statement"].strip():
             errors.append(f"Fact {fact_id} must have a non-empty statement.")
 
-        if fact.get("verification_status") not in ALLOWED_STATUSES:
-            errors.append(
-                f"Fact {fact_id} has an invalid verification_status."
-            )
+        if (
+            not isinstance(fact.get("verification_status"), str)
+            or fact.get("verification_status") not in ALLOWED_STATUSES
+        ):
+            errors.append(f"Fact {fact_id} has an invalid verification_status.")
+
+        if not isinstance(fact.get("category"), str) or not fact["category"].strip():
+            errors.append(f"Fact {fact_id} must have a text category.")
 
         fact_crop = fact.get("crop_id")
-        if fact_crop != "all" and fact_crop not in crop_ids:
+        if not isinstance(fact_crop, str) or (fact_crop != "all" and fact_crop not in crop_ids):
             errors.append(f"Fact {fact_id} references unknown crop {fact_crop}.")
 
         refs = fact.get("source_ids")
@@ -120,10 +125,8 @@ def validate_knowledge(data: dict[str, Any]) -> list[str]:
             errors.append(f"Fact {fact_id} must have at least one source.")
         else:
             for source_id in refs:
-                if source_id not in source_ids:
-                    errors.append(
-                        f"Fact {fact_id} references unknown source {source_id}."
-                    )
+                if not isinstance(source_id, str) or source_id not in source_ids:
+                    errors.append(f"Fact {fact_id} references unknown source {source_id}.")
 
     # Check crop-to-fact references.
     for crop in crops:
@@ -137,27 +140,21 @@ def validate_knowledge(data: dict[str, Any]) -> list[str]:
             continue
 
         for fact_id in refs:
-            if fact_id not in fact_ids:
-                errors.append(
-                    f"Crop {crop_id} references unknown fact {fact_id}."
-                )
+            if not isinstance(fact_id, str) or fact_id not in fact_ids:
+                errors.append(f"Crop {crop_id} references unknown fact {fact_id}.")
 
     # Check pending research IDs and safeguards.
     research_ids = set()
 
     for index, item in enumerate(pending):
         if not isinstance(item, dict):
-            errors.append(
-                f"Pending research record {index} must be an object."
-            )
+            errors.append(f"Pending research record {index} must be an object.")
             continue
 
         research_id = item.get("research_id")
 
         if not isinstance(research_id, str) or not research_id.strip():
-            errors.append(
-                f"Pending research record {index} has an invalid research_id."
-            )
+            errors.append(f"Pending research record {index} has an invalid research_id.")
         elif research_id in research_ids:
             errors.append(f"Duplicate research_id: {research_id}")
         else:
@@ -170,4 +167,64 @@ def validate_knowledge(data: dict[str, Any]) -> list[str]:
                     "rule_creation_allowed to false."
                 )
 
+    by_fact = {
+        f["fact_id"]: f for f in facts if isinstance(f, dict) and isinstance(f.get("fact_id"), str)
+    }
+    for crop in crops:
+        if not isinstance(crop, dict):
+            continue
+        if crop.get("facts"):
+            errors.append(
+                "Nested facts are unsupported; store facts in the validated top-level facts list."
+            )
+        for fid in crop.get("fact_ids", []) if isinstance(crop.get("fact_ids"), list) else []:
+            if (
+                isinstance(fid, str)
+                and fid in by_fact
+                and by_fact[fid].get("crop_id") not in ("all", crop.get("crop_id"))
+            ):
+                errors.append(f'Crop {crop.get("crop_id")} references another crop fact {fid}.')
+    for fact in facts:
+        if not isinstance(fact, dict):
+            continue
+        prop = fact.get("property")
+        if prop is not None and not isinstance(prop, str):
+            errors.append(f'Fact {fact.get("fact_id")} has an invalid property.')
+            continue
+        if "applicability" in fact and not isinstance(fact["applicability"], dict):
+            errors.append(f'Fact {fact.get("fact_id")} has invalid applicability.')
+        if prop in {
+            "soil_ph_range",
+            "ph_range",
+            "seasonal_water_need_mm",
+            "water_screening_range_mm",
+        }:
+            try:
+                low, high = numeric_range(fact.get("value"))
+                if low < 0 or (
+                    prop not in {"seasonal_water_need_mm", "water_screening_range_mm"} and high > 14
+                ):
+                    raise ValueError()
+            except (ValueError, TypeError, OverflowError):
+                errors.append(f'Fact {fact.get("fact_id")} has an invalid numeric range.')
+        allowed = {
+            "growing_season": {"kharif", "rabi", "zaid"},
+            "soil_texture": {
+                "sandy",
+                "loamy",
+                "clayey",
+                "other",
+                "sandy_loam",
+                "clay_loam",
+                "silt_loam",
+                "silty_clay_loam",
+            },
+            "water_requirement": {"low", "moderate", "high"},
+        }.get(prop)
+        if allowed:
+            from evidence import values
+
+            parsed = values(fact.get("value"))
+            if not parsed or not set(parsed).issubset(allowed):
+                errors.append(f'Fact {fact.get("fact_id")} has unsupported values for {prop}.')
     return errors

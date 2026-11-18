@@ -18,56 +18,32 @@ def evaluate_rule(
     - is UNKNOWN when a required condition cannot be evaluated.
     """
 
-    condition_results = tuple(
-        condition(user_profile, facts)
-        for condition in rule.conditions
-    )
+    condition_results = tuple(condition(user_profile, facts) for condition in rule.conditions)
 
-    statuses = {
-        result.status
-        for result in condition_results
-    }
+    statuses = {result.status for result in condition_results}
 
-    if RuleStatus.UNKNOWN in statuses:
-        status = RuleStatus.UNKNOWN
-    elif RuleStatus.NOT_FIRED in statuses:
+    if RuleStatus.NOT_FIRED in statuses:
         status = RuleStatus.NOT_FIRED
+    elif RuleStatus.UNKNOWN in statuses:
+        status = RuleStatus.UNKNOWN
     else:
         status = RuleStatus.FIRED
 
-    fact_ids = tuple(
-        fact_id
-        for result in condition_results
-        for fact_id in result.fact_ids
-    )
+    fact_ids = tuple(fact_id for result in condition_results for fact_id in result.fact_ids)
 
-    source_ids = tuple(
-        source_id
-        for result in condition_results
-        for source_id in result.source_ids
-    )
+    source_ids = tuple(source_id for result in condition_results for source_id in result.source_ids)
 
-    missing_fields = tuple(
-        field
-        for result in condition_results
-        for field in result.missing_fields
-    )
+    missing_fields = tuple(field for result in condition_results for field in result.missing_fields)
 
-    reason_codes = tuple(
-        code
-        for result in condition_results
-        for code in result.reason_codes
-    )
+    reason_codes = tuple(code for result in condition_results for code in result.reason_codes)
 
     if status == RuleStatus.FIRED:
         explanation = (
-            f"Rule {rule.rule_id} fired because all required "
-            "conditions were satisfied."
+            f"Rule {rule.rule_id} fired because all required " "conditions were satisfied."
         )
     elif status == RuleStatus.NOT_FIRED:
         explanation = (
-            f"Rule {rule.rule_id} did not fire because at least "
-            "one condition was not satisfied."
+            f"Rule {rule.rule_id} did not fire because at least " "one condition was not satisfied."
         )
     else:
         explanation = (
@@ -79,7 +55,7 @@ def evaluate_rule(
         rule_id=rule.rule_id,
         status=status,
         evaluated_conditions=condition_results,
-        conclusion=rule.conclusion,
+        conclusion=rule.conclusion if status == RuleStatus.FIRED else "No conclusion established.",
         explanation=explanation,
         fact_ids=tuple(dict.fromkeys(fact_ids)),
         source_ids=tuple(dict.fromkeys(source_ids)),
@@ -96,9 +72,22 @@ def evaluate_rules(
     Evaluate all enabled CropNova rules.
     """
 
+    from evidence import scope_matches
+
+    facts = [
+        f
+        for f in facts
+        if isinstance(f, dict)
+        and f.get("crop_id") in (user_profile.get("crop_id"), "all")
+        and f.get("verification_status", "verified")
+        in {"verified", "verified_general", "verified_context_specific"}
+        and f.get("fact_id")
+        and f.get("source_ids")
+        and scope_matches(f, user_profile)
+    ]
     results = []
 
-    for rule in get_rules():
+    for rule in sorted(get_rules(), key=lambda item: -item.priority):
         if not rule.enabled:
             continue
 

@@ -1,0 +1,118 @@
+{
+  "date": "2026-11-14",
+  "source": "/Users/abhinavsharma/Downloads/Final Guidelines.pdf",
+  "overall": "Technical methods implemented; full submission requirements remain incomplete.",
+  "report_preparation": "Paused until the user provides the official template.",
+  "criteria": [
+    {
+      "criterion": "Problem statement and objectives",
+      "status": "implemented",
+      "evidence": [
+        "README.md",
+        "docs/fuzzy_and_search.md"
+      ],
+      "note": "Feasible scope and limitations are described. Final wording belongs in the forthcoming template."
+    },
+    {
+      "criterion": "Recent literature review and comparative table",
+      "status": "partial",
+      "evidence": [
+        "research/literature_candidates.json"
+      ],
+      "note": "Recent agricultural research candidates located. Full-paper review and the final comparative table are not complete. Snake sources are examples, not CropNova agricultural literature."
+    },
+    {
+      "criterion": "State-space search",
+      "status": "implemented",
+      "evidence": [
+        "astar_search.py",
+        "preparation_planner.py",
+        "docs/fuzzy_and_search.md"
+      ],
+      "note": "Explicit states, initial state, goal, actions, transitions, positive costs and an admissible/consistent heuristic; A* compared with uniform-cost search."
+    },
+    {
+      "criterion": "Knowledge representation",
+      "status": "implemented",
+      "evidence": [
+        "knowledge_base/data/knowledge_facts.json",
+        "evidence.py"
+      ],
+      "note": "Structured fact/source records with applicability and provenance; the guideline examples do not mandate an ontology."
+    },
+    {
+      "criterion": "Intelligent system design",
+      "status": "implemented",
+      "evidence": [
+        "agent.py",
+        "app.py",
+        "docs/fuzzy_and_search.md"
+      ],
+      "note": "Coordinating agent, reasoning layers, source-backed explanations and optional neural language components."
+    },
+    {
+      "criterion": "CSP or fuzzy logic",
+      "status": "implemented",
+      "evidence": [
+        "csp_solver.py",
+        "constraint_definitions.py",
+        "fuzzy_logic.py"
+      ],
+      "note": "The guideline allows either. Both are now implemented with distinct responsibilities."
+    },
+    {
+      "criterion": "Other AI techniques where applicable",
+      "status": "implemented",
+      "evidence": [
+        "semantic_search.py",
+        "assessment_questions.py",
+        "gemini_provider.py"
+      ],
+      "note": "Pretrained encoder and LLM integrations; no claim of training either model."
+    },
+    {
+      "criterion": "Ethics and human benefit",
+      "status": "partial",
+      "evidence": [
+        "evidence.py",
+        "fuzzy_logic.py",
+        "preparation_planner.py",
+        "report_store.py"
+      ],
+      "note": "Uncertainty, scope, source traceability, private links and provider disclosure implemented. Independent fairness and local field evaluation remain outstanding; bonus marks cannot be guaranteed."
+    },
+    {
+      "criterion": "AI versus non-AI distinction",
+      "status": "implemented",
+      "evidence": [
+        "docs/fuzzy_and_search.md"
+      ],
+      "note": "Methods separated from web, validation, storage and PDF infrastructure."
+    },
+    {
+      "criterion": "Continuous evaluation and results",
+      "status": "implemented",
+      "evidence": [
+        "tests/",
+        "docs/fuzzy_search_checks.json",
+        "docs/multipage_checks.json"
+      ],
+      "note": "318 automated tests; 32 A*/uniform-cost comparisons; production Gunicorn multi-page flow checked. These do not measure agricultural accuracy."
+    },
+    {
+      "criterion": "Final report",
+      "status": "pending",
+      "evidence": [],
+      "note": "Awaiting the official template; no new final report prepared."
+    },
+    {
+      "criterion": "Final presentation, viva and demonstration",
+      "status": "pending",
+      "evidence": [
+        "app.py",
+        "tests/"
+      ],
+      "note": "Working code and sample cases are available; the final PPT, rehearsed viva and presentation are not complete."
+    }
+  ]
+}

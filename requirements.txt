@@ -1,2 +1,7 @@
-# CropNova's Version 1 prototype uses only the Python standard library.
-# Python 3.10+ is required for the type annotations used by the modules.
+# PDF reports and the deployment web server. Core crop checks use the standard library.
+reportlab==5.0.1
+gunicorn==26.2.0
+
+# Local, pretrained transformer for evidence search.
+sentence-transformers==6.2.0
+torch==2.10.0

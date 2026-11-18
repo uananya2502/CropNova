@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-15",
+  "styles_version": 11,
+  "tests_passed": 405,
+  "css_syntax": "passed",
+  "public_page_assets": "passed",
+  "saved_assessment_layout": "passed",
+  "existing_user_assessment": true,
+  "changes": [
+    "system sans-serif typography",
+    "neutral background with green, blue, amber and coral accents",
+    "full-width result layout",
+    "collapsed field overview",
+    "collapsed secondary calculation and question sections",
+    "larger comparison text",
+    "responsive reading widths"
+  ],
+  "visual_browser_review": "Not performed; localhost browser access was previously blocked by browser policy."
+}

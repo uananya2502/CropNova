@@ -33,12 +33,12 @@ class TestAgent(unittest.TestCase):
             "OUT_OF_RANGE",
         )
 
-    def test_pending_knowledge_is_not_presented_as_supported(self):
+    def test_missing_numeric_water_is_not_presented_as_supported(self):
         result = run_assessment(VALID)
 
         self.assertEqual(
             result["status"],
-            "NO_SUPPORTED_KNOWLEDGE",
+            "MORE_INFORMATION_NEEDED",
         )
 
         self.assertEqual(
@@ -52,7 +52,7 @@ class TestAgent(unittest.TestCase):
 
         self.assertEqual(
             result["knowledge_summary"]["total_crops"],
-            4,
+            10,
         )
 
         self.assertGreater(

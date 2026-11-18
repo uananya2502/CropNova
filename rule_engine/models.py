@@ -86,6 +86,4 @@ class RuleEvaluation:
     def to_dict(self) -> dict[str, Any]:
         """Convert all rule results into a JSON-friendly dictionary."""
 
-        return {
-            "results": [result.to_dict() for result in self.results]
-        }
+        return {"results": [result.to_dict() for result in self.results]}

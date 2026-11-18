@@ -1,72 +1,109 @@
 # CropNova
 
-CropNova is an explainable agricultural decision-support prototype. It combines a source-aware knowledge base, an optional IF-THEN rule-engine adapter, a genuine constraint-satisfaction search, and an intelligent agent with a browser interface.
+CropNova compares crop options with a field's location, season, soil and water, then explains the findings with published sources. The public interface uses plain language and supports personalised PDF reports.
 
-> CropNova is an educational prototype. It does not guarantee crop success and does not replace advice from local agricultural professionals.
+The knowledge base has 41 facts and 17 source records for wheat, rice, maize and chickpea. Regional coverage varies. These are preliminary reference checks, not field-validated recommendations or guarantees of crop success.
 
-## What is implemented
+## Run
 
-- `csp_solver.py` defines the `selected_crop` variable, candidate domain, deterministic backtracking search, conflict output, and diagnostics.
-- `constraint_definitions.py` checks season, water, soil texture, and pH using only user input and applicable facts marked `verified`.
-- `agent.py` validates and normalizes input, loads and validates knowledge, invokes a rule-engine adapter, runs the CSP, asks targeted follow-ups, and assembles one of the six agreed result statuses.
-- `explanations.py` creates deterministic candidate explanations and a compact evidence package that a future grounded GenAI adapter can consume without changing decisions.
-- `app.py` provides a responsive browser form and report using only the Python standard library.
-- `tests/` covers satisfiable, rejected, multiple-solution, unsatisfiable, unknown, unverified-fact, invalid-input, follow-up, and end-to-end browser cases.
+Python 3.13 is the tested runtime.
 
-The current knowledge records are marked `pending_research` and contain no verified agricultural facts. The integrated app therefore correctly returns `NO_SUPPORTED_KNOWLEDGE` or `MORE_INFORMATION_NEEDED` instead of inventing a recommendation. Add verified, sourced facts through the knowledge-base module to enable feasible outcomes.
-
-## Run the browser prototype
-
-Python 3.10 or newer is required; there are no third-party runtime dependencies.
-
-```powershell
-python app.py
+```sh
+python3 -m pip install -r requirements.txt
+python3 scripts/prepare_transformer.py
+python3 app.py
 ```
 
-Open `http://127.0.0.1:8000`.
+Open `http://127.0.0.1:8000/`. See [deployment instructions](docs/deployment.md) for the Gunicorn start command, private environment variables, storage and hosting limits. No hosting deployment is performed automatically.
 
-## Run the demonstration and tests
+## What users can do
 
-```powershell
-python main.py
-python -m unittest discover -v
-python -m unittest discover -s knowledge_base/tests -v
+- Enter a field profile and compare four crop options against applicable published references.
+- See their entered values beside the references, with a plain explanation of each finding.
+- Review missing measurements, uncertain guidance and next steps.
+- Request an optional Gemini-generated explanation grounded in the recorded assessment.
+- Download a personalised PDF with inputs, findings, explanations, source links and unresolved questions.
+- Reopen the result or download it without another provider request. Result links are private bearer links and expire after an hour.
+
+Synthetic fixtures are reserved for tests. A public request cannot activate them. The website and PDF do not show internal engine codes or diagnostic traces.
+
+## Read the code
+
+| Module | Responsibility |
+|---|---|
+| `app.py` | HTTP routes, published-data assessment flow, redirects and downloads |
+| `web_views.py`, `static/` | Public pages, responsive styling, illustration and form feedback |
+| `agent.py` | Coordinates source retrieval, rule evaluation and crop checks |
+| `profile_validation.py` | Normalises inputs and validates labels and measurements |
+| `constraint_definitions.py`, `csp_solver.py` | Evidence-based constraint checks and candidate search |
+| `assessment_summary.py` | Shared plain-language explanations for the website and PDF |
+| `assessment_pdf.py` | PDF layout using the saved assessment |
+| `report_store.py` | Private, short-lived SQLite report storage |
+| `genai_explainer.py`, `gemini_provider.py` | Provider requests, structured replies, validation and fallback |
+| `semantic_search.py` | Local MiniLM transformer retrieves relevant saved-assessment evidence |
+| `assessment_questions.py` | Source-grounded follow-up questions, citations, validation and fallback |
+| `knowledge_base/` | Published facts, applicability, source records and validation |
+
+The rule engine and CSP determine recorded outcomes. Separate fuzzy alignment and A* follow-up planning do not overwrite those outcomes. The language model explains them; it cannot update those outcomes or the knowledge base. Structural response validation does not prove generated prose is factually correct.
+
+The user interface offers supported crop comparison, not unimplemented objectives such as yield optimisation or a soil-improvement ranking. Internal integration endpoints and engine interfaces remain available for development.
+
+## Tests
+
+```sh
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
 ```
 
-## Public interfaces
+Current checks cover engine correctness, evidence scope, provider failures, public-data separation, private report downloads, PDF content, saved-result integrity, and concurrent HTTP requests.
 
-```python
-from csp_solver import solve_constraints
-from agent import run_assessment
+Run `python3 scripts/verify_ai.py --live` for three actual provider requests, subject to the account's quota. Automated tests use controlled responses and do not consume provider quota.
 
-csp_result = solve_constraints(candidates, user_profile, constraints=None)
-final_report = run_assessment(user_profile)
-```
+## More detail
 
-Candidate facts use the knowledge contract:
+- [Beginner explanation of generative AI](docs/generative_ai.md)
+- [Published crop requirements and example inputs](docs/knowledge_requirements.md)
+- [Deployment and report storage](docs/deployment.md)
+- [Implementation notes](docs/improvements.md)
 
-```json
-{
-  "fact_id": "FACT001",
-  "property": "growing_season",
-  "value": ["rabi"],
-  "applicability": {"region": "Example State"},
-  "source_ids": ["SRC001"],
-  "verification_status": "verified"
-}
-```
+## Ask about an assessment
 
-Supported constraint properties are `growing_season`, `water_requirement`, `soil_texture`, and `soil_ph_range`. Aliases are documented in `constraint_definitions.py`.
+A pretrained local sentence transformer now retrieves relevant findings for follow-up questions. Gemini, the existing LLM, writes a short answer citing those findings. Crop decisions remain with the reasoning engine. Prepare the model once with `python3 scripts/prepare_transformer.py` before starting the server. See [the beginner transformer guide](docs/transformers.md) for setup, examples, limitations and verification.
 
-If a teammate later adds `rule_engine.evaluate_rules(profile, facts)`, the agent imports and uses it automatically. Until then, knowledge-base crops seed the CSP domain only and are never labelled recommendations.
+## Learning and viva preparation
 
-## Result statuses
+Start with [the beginner learning guide](docs/learning_guide.md). A printable version is generated at `output/pdf/CropNova-Learning-and-Viva-Guide.pdf` using `python3 scripts/build_learning_guide.py`. Code locations in the guide are generated from the current Python source. The latest review results are in `docs/project_review.json`.
 
-- `FEASIBLE_OPTIONS_FOUND`
-- `MORE_INFORMATION_NEEDED`
-- `NO_FEASIBLE_OPTION`
-- `NO_SUPPORTED_KNOWLEDGE`
-- `INVALID_INPUT`
-- `SYSTEM_ERROR`
+## Fuzzy logic and A*
 
-See `docs/csp_problem.md` and `docs/integration_checklist.md` for the worked CSP example, contracts, demonstration path, and team hand-off checklist.
+New assessment pages show a gradual pH/water reference-alignment index and a minimum-relative-effort plan for follow-up information tasks. The index is not a crop-success probability; the plan does not guarantee that measurements or reviewed evidence will make a crop feasible.
+
+- `fuzzy_logic.py`: membership functions, nine zero-order Sugeno rules, and weighted output.
+- `astar_search.py`: priority-queue A* and uniform-cost baseline.
+- `preparation_planner.py`: the assessment-specific states, goals, tasks, prerequisites and relative costs.
+- `docs/fuzzy_and_search.md`: beginner implementation notes and examples.
+- `docs/guidelines_check.json`: status against the supplied course guidelines.
+
+Run `python3 scripts/check_fuzzy_search.py` to repeat the 32 controlled scenario comparisons. The final academic report is deferred until its template arrives. The personal learning handbook now covers these additions and includes refreshed code locations. It is separate from the deferred submission report.
+
+## Multi-page website and production packaging
+
+The home page now leads to a separate field form. Generated results, the online report, next steps and editing each have their own route. Sources, how-it-works and privacy also have dedicated pages. Submitting an edit creates a new snapshot instead of overwriting an old result.
+
+`public_pages.py` contains public screens; `assessment_pages.py` contains saved-assessment screens. Production runs through `gunicorn.conf.py` and the Procfile. A Dockerfile, Compose definition, readiness endpoint and `scripts/check_deployment.py` are included. See [deployment instructions](docs/deployment.md). Docker image execution requires Docker and has not been verified in this workspace.
+
+## Dropdown form and visible coverage
+
+The assessment form now uses menus for state, district, season, soil texture, pH, drainage, water budget, water basis, crop and optional explanation. A profile selector loads each of the four complete worked reference examples. The coverage preview runs the same four checks without saving a report or calling an AI provider.
+
+`form_choices.py` holds the input catalogues; `assessment_form.py` renders controls and the coverage table; `coverage_preview.py` builds the preview. District menus cover Haryana, Rajasthan and Punjab. Location choices do not add agricultural evidence. Other states are labelled as having limited local crop coverage. See `docs/dropdowns_and_coverage.md`.
+
+### Farmer-focused input and multilingual explanations
+
+The existing app now includes illustrated seasonal rain observations, optional exact rainfall, simple water-access choices, and English/Hindi/Punjabi explanations. Crops that match the four checks appear first; other options use a compact comparison. See [the implementation and data-scope notes](docs/farmer_experience.md).
+
+The library contains **640 records**: **112 core records plus 528 historical FAO attributes** for the assessed crops. Historical attributes are visible for reference but excluded from decisions and LLM evidence. This count is not a farm dataset or an accuracy claim.
+
+### Mandi prices and weekly forecasting
+
+Open **Mandi prices** on a saved assessment to compare dated wholesale prices for a crop, mandi, variety and grade. An optional weekly estimate appears when the model beats the previous-week baseline on later test weeks and the imported reports are recent. The market advice uses the recorded field result and keeps all crop findings intact. See [data import and forecast validation](docs/mandi_prices.md).

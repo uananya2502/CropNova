@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-14",
+  "checks": [
+    {
+      "case": "fuzzy_gradual",
+      "status": "NO_SUPPORTED_KNOWLEDGE",
+      "page": "passed",
+      "structured_output": "passed"
+    },
+    {
+      "case": "planner_combined_tasks",
+      "status": "MORE_INFORMATION_NEEDED",
+      "page": "passed",
+      "structured_output": "passed"
+    },
+    {
+      "case": "known_shortfall",
+      "status": "NO_FEASIBLE_OPTION",
+      "page": "passed",
+      "structured_output": "passed"
+    }
+  ]
+}

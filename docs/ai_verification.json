@@ -1,0 +1,121 @@
+{
+  "checked_at_utc": "2026-10-29T17:13:41.128638+00:00",
+  "all_assessments_passed": true,
+  "live_ai_status": "completed",
+  "provider": "gemini",
+  "cases": [
+    {
+      "case": "Supported match",
+      "inputs": {
+        "mode": "real",
+        "state": "Haryana",
+        "season": "rabi",
+        "soil_texture": "loamy",
+        "soil_ph": "7",
+        "water_availability": "unknown",
+        "soil_fertility": "unknown",
+        "irrigation": "unknown",
+        "objective": "find_suitable_crop",
+        "water_budget_mm": "650",
+        "water_basis": "seasonal_crop_water",
+        "soil_drainage": "well_drained",
+        "candidate_ids": [
+          "wheat"
+        ]
+      },
+      "expected_status": "FEASIBLE_OPTIONS_FOUND",
+      "actual_status": "FEASIBLE_OPTIONS_FOUND",
+      "assessment_passed": true,
+      "ai_status": "generated",
+      "ai_message": "AI-generated wording based on the assessment evidence. Check it against the recorded results.",
+      "ai_explanations": [
+        {
+          "crop_id": "wheat",
+          "status": "feasible",
+          "text": "This assessment is based on research data and preliminary published-reference screening only. Wheat passes the growing season, water availability, soil texture, and soil pH checks. Timing, losses, and local requirements remain unverified.",
+          "fact_ids": [
+            "FACT_WHEAT_GROWING_SEASON_20261029",
+            "FACT_WHEAT_WATER_SCREENING_RANGE_MM_REF_V3",
+            "FACT_WHEAT_SOIL_TEXTURE_REF_V3",
+            "FACT_WHEAT_SOIL_PH_RANGE_REF_V3"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "Water shortfall",
+      "inputs": {
+        "mode": "real",
+        "state": "Haryana",
+        "season": "rabi",
+        "soil_texture": "loamy",
+        "soil_ph": "7",
+        "water_availability": "unknown",
+        "soil_fertility": "unknown",
+        "irrigation": "unknown",
+        "objective": "find_suitable_crop",
+        "water_budget_mm": "300",
+        "water_basis": "seasonal_crop_water",
+        "soil_drainage": "well_drained",
+        "candidate_ids": [
+          "wheat"
+        ]
+      },
+      "expected_status": "NO_FEASIBLE_OPTION",
+      "actual_status": "NO_FEASIBLE_OPTION",
+      "assessment_passed": true,
+      "ai_status": "generated",
+      "ai_message": "AI-generated wording based on the assessment evidence. Check it against the recorded results.",
+      "ai_explanations": [
+        {
+          "crop_id": "wheat",
+          "status": "rejected",
+          "text": "Wheat successfully passed the checks for growing season, soil texture, and soil pH. However, it had a shortfall because the water availability of 300 mm is below the published seasonal crop-water reference range of 450-650 mm. Please note this is a preliminary published-reference screening only and does not establish field suitability.",
+          "fact_ids": [
+            "FACT_WHEAT_GROWING_SEASON_20261029",
+            "FACT_WHEAT_SOIL_TEXTURE_REF_V3",
+            "FACT_WHEAT_SOIL_PH_RANGE_REF_V3",
+            "FACT_WHEAT_WATER_SCREENING_RANGE_MM_REF_V3"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "Missing soil pH",
+      "inputs": {
+        "mode": "real",
+        "state": "Haryana",
+        "season": "rabi",
+        "soil_texture": "loamy",
+        "soil_ph": "",
+        "water_availability": "unknown",
+        "soil_fertility": "unknown",
+        "irrigation": "unknown",
+        "objective": "find_suitable_crop",
+        "water_budget_mm": "650",
+        "water_basis": "seasonal_crop_water",
+        "soil_drainage": "well_drained",
+        "candidate_ids": [
+          "wheat"
+        ]
+      },
+      "expected_status": "MORE_INFORMATION_NEEDED",
+      "actual_status": "MORE_INFORMATION_NEEDED",
+      "assessment_passed": true,
+      "ai_status": "generated",
+      "ai_message": "AI-generated wording based on the assessment evidence. Check it against the recorded results.",
+      "ai_explanations": [
+        {
+          "crop_id": "wheat",
+          "status": "unknown",
+          "text": "This assessment is a preliminary published-reference screening only, and a screening match does not prove field suitability. Wheat passed checks for growing season compatibility, water availability, and soil texture compatibility. However, the soil pH range is unknown because measured soil pH is missing. This result is based on a research dataset.",
+          "fact_ids": [
+            "FACT_WHEAT_GROWING_SEASON_20261029",
+            "FACT_WHEAT_WATER_SCREENING_RANGE_MM_REF_V3",
+            "FACT_WHEAT_SOIL_TEXTURE_REF_V3"
+          ]
+        }
+      ]
+    }
+  ]
+}

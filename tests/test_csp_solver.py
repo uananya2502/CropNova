@@ -100,8 +100,10 @@ class TestCSPSolver(unittest.TestCase):
         )
 
         self.assertEqual(result.status.value, "satisfied")
-        self.assertIn("FACT_WHEAT_004", result.fact_ids)
-        self.assertIn("SRC_CCSHAU_RABI_SEED_001", result.source_ids)
+        # The university record is dated Rabi 2025-26, so a generic Rabi
+        # profile uses the separately sourced HSDC record instead.
+        self.assertNotIn("FACT_WHEAT_004", result.fact_ids)
+        self.assertIn("FACT_WHEAT_GROWING_SEASON_20261029", result.fact_ids)
 
 
     def test_unverified_fact_is_not_satisfied(self):
@@ -131,11 +133,13 @@ class TestCSPSolver(unittest.TestCase):
         )
 
         self.assertEqual(result.status.value, "unknown")
-        self.assertEqual(result.reason_code, "INCOMPATIBLE_WATER_UNITS")
-        self.assertIn("FACT_WHEAT_001", result.fact_ids)
-        self.assertIn("SRC_FAO_WATER_001", result.source_ids)
+        # Published references now have a dedicated numeric input.
+        self.assertEqual(result.reason_code, "MISSING_USER_INPUT")
+        self.assertIn("water.budget_mm", result.missing_fields)
+        self.assertIn("FACT_WHEAT_WATER_SCREENING_RANGE_MM_REF_V3", result.fact_ids)
+        self.assertIn("SRC_FAO_SEASONAL_WATER", result.source_ids)
     
-    def test_missing_real_soil_evidence_returns_unknown(self):
+    def test_removed_soil_evidence_returns_unknown(self):
         from knowledge_base.loader import load_knowledge
         from knowledge_base.retrieval import get_usable_facts
         from constraint_definitions import (
@@ -146,6 +150,9 @@ class TestCSPSolver(unittest.TestCase):
         knowledge = load_knowledge()
         facts = get_usable_facts(knowledge, crop_id="wheat")
 
+        # Simulate an incomplete dataset; the merged dataset has soil references.
+        facts = [f for f in facts if f.get("property") not in
+                 {"soil_texture", "soil_ph_range"}]
         candidate = {"candidate_id": "wheat", "name": "Wheat"}
         profile = {
             "region": {"state": "Haryana", "district": "Rewari"},

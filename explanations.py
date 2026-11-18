@@ -93,6 +93,8 @@ def follow_up_question(field: str) -> str:
         "water.availability": "Is water availability low, moderate, or high?",
         "soil.texture": "What is the soil texture: sandy, loamy, clayey, or other?",
         "soil.ph": "If available, what is the measured soil pH?",
+        "water.budget_mm": "What is the estimated water budget in mm, and is it seasonal crop-water supply or supplemental irrigation?",
+        "soil.drainage": "Is the field well drained or poorly drained?",
     }
     return questions.get(field, f"Please provide {field.replace('.', ' ')}.")
 

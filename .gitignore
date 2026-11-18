@@ -7,3 +7,14 @@ __pycache__/
 __pycache__/
 *.py[cod]
 .venv/
+
+instance/
+.env.*
+!.env.example
+
+tmp/
+
+# Account setup screenshots and generated private assessment exports.
+reports/verification/
+output/pdf/CropNova-Farm-Assessment.pdf
+reports/rendered/

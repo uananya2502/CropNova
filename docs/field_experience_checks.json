@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-15",
+  "tests_passed": 415,
+  "styles_version": 13,
+  "generated_backgrounds": [
+    {
+      "asset": "field-morning",
+      "bytes": 184948
+    },
+    {
+      "asset": "botanical-paper",
+      "bytes": 40484
+    },
+    {
+      "asset": "harvest-banner",
+      "bytes": 179562
+    }
+  ],
+  "plain_crop_and_state_names": "passed",
+  "ten_crop_profiles": "passed",
+  "practical_plan_and_published_guidance": "passed",
+  "water_shortfall_priority": "passed",
+  "saved_edit_report_pages": "passed",
+  "readiness": "passed",
+  "motion": "CSS hover/selection/disclosure/entrance transitions; reduced-motion override included",
+  "visual_browser_review": "Not performed; browser policy blocks localhost access."
+}

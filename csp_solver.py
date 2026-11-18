@@ -45,7 +45,9 @@ def _facts_for(
             if key in supplied:
                 facts.extend(supplied[key])
                 break
-    return facts
+    crop_id = candidate.get("crop_id", candidate.get("candidate_id"))
+    return [fact for fact in facts if isinstance(fact, Mapping)
+            and fact.get("crop_id", crop_id) in (crop_id, "all")]
 
 
 def define_problem(
@@ -56,7 +58,7 @@ def define_problem(
     return CSPProblem(
         variables=("selected_crop",),
         domains={"selected_crop": domain},
-        constraints=tuple(constraints or DEFAULT_CONSTRAINTS),
+        constraints=tuple(DEFAULT_CONSTRAINTS if constraints is None else constraints),
     )
 
 

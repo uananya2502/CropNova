@@ -1,0 +1,14 @@
+services:
+  cropnova:
+    build: .
+    ports:
+      - "${CROPNOVA_BIND:-127.0.0.1}:${CROPNOVA_PORT:-8000}:8000"
+    environment:
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - cropnova-data:/data
+    restart: unless-stopped
+volumes:
+  cropnova-data:

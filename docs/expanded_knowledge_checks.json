@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-15",
+  "crops": 10,
+  "total_records": 640,
+  "core_records": 112,
+  "historical_background_records": 528,
+  "usable_reviewed_agricultural_records": 107,
+  "constraint_eligible_reviewed_records": 71,
+  "reviewed_background_records": 36,
+  "public_reference_profiles": 10,
+  "source_records": 36,
+  "not_a_field_accuracy_study": true,
+  "browser_visual_verification": "Not performed; local browser access was blocked by the browser policy."
+}

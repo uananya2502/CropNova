@@ -1,0 +1,182 @@
+{
+  "date": "2026-11-14",
+  "automated_tests_passed": 244,
+  "behavior_comparisons_passed": 24,
+  "knowledge": {
+    "crops": 4,
+    "facts": 41,
+    "usable_facts": 36,
+    "sources": 17,
+    "validation_errors": []
+  },
+  "cases": [
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "case": "reference example"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "soil_ph": ""
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "water_budget_mm": "0"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    },
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "state": "Unknown State"
+      },
+      "status": "NO_SUPPORTED_KNOWLEDGE"
+    },
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "season": "unknown"
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-wheat",
+      "change": {
+        "soil_drainage": "poorly_drained"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "case": "reference example"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "soil_ph": ""
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "water_budget_mm": "0"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "state": "Unknown State"
+      },
+      "status": "NO_SUPPORTED_KNOWLEDGE"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "season": "unknown"
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-rice",
+      "change": {
+        "soil_drainage": "poorly_drained"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "case": "reference example"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "soil_ph": ""
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "water_budget_mm": "0"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "state": "Unknown State"
+      },
+      "status": "NO_SUPPORTED_KNOWLEDGE"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "season": "unknown"
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-chickpea",
+      "change": {
+        "soil_drainage": "poorly_drained"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "case": "reference example"
+      },
+      "status": "FEASIBLE_OPTIONS_FOUND"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "soil_ph": ""
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "water_budget_mm": "0"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "state": "Unknown State"
+      },
+      "status": "NO_SUPPORTED_KNOWLEDGE"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "season": "unknown"
+      },
+      "status": "MORE_INFORMATION_NEEDED"
+    },
+    {
+      "profile": "reference-maize",
+      "change": {
+        "soil_drainage": "poorly_drained"
+      },
+      "status": "NO_FEASIBLE_OPTION"
+    }
+  ]
+}

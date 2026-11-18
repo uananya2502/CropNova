@@ -3,14 +3,14 @@
 ## Version 1 formulation
 
 - Variable: `selected_crop`
-- Domain: candidate crops supplied by the rule engine or, while that module is absent, crop records from the knowledge base
+- Domain: the crop records selected by the user, or all four knowledge-base crops when no selection is made
 - Hard constraints: season compatibility, water availability, soil texture, and soil pH
 - Search: deterministic backtracking over the candidate domain in input order
 - Consistency: a complete assignment is feasible only when every implemented hard constraint is `satisfied`
 
 Each hard check is three-valued: `satisfied`, `violated`, or `unknown`. Unknown is never converted to satisfied. A candidate with one violated constraint is rejected. A candidate with no violation but at least one unknown check stays unknown and needs more information or verified knowledge.
 
-Facts may satisfy a constraint only when they are marked `verified` and their regional applicability matches the user profile. Pending, missing, conflicting, malformed, or out-of-scope facts produce an unknown result.
+In the public pipeline, facts must have `verified_general` or `verified_context_specific` status, reviewed source records, and matching applicability. The direct solver also accepts `verified` for controlled fixtures. Pending, missing, conflicting, malformed, or out-of-scope facts produce an unknown result.
 
 ## Worked viva example
 
