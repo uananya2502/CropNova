@@ -12,14 +12,23 @@ from socketserver import ThreadingMixIn
 from urllib.parse import parse_qs
 from wsgiref.simple_server import make_server, WSGIServer
 
-from agent import run_assessment
-from genai_explainer import generate_explanation
-from public_profiles import REFERENCE_PROFILES
-from form_choices import submitted_crops, public_options
-from report_store import save_report, load_report
-from web_views import message_page, genai_panel  # Compatibility export for integrations.
-from public_pages import home_page, assessment_page, how_it_works_page, sources_page, privacy_page
-from assessment_pages import saved_page
+from cropnova.core.agent import run_assessment
+from cropnova.ai.genai_explainer import generate_explanation
+from cropnova.config.public_profiles import REFERENCE_PROFILES
+from cropnova.web.form_choices import submitted_crops, public_options
+from cropnova.reports.report_store import save_report, load_report
+from cropnova.web.web_views import (
+    message_page,
+    genai_panel as genai_panel,
+)  # Public compatibility export.
+from cropnova.web.public_pages import (
+    home_page,
+    assessment_page,
+    how_it_works_page,
+    sources_page,
+    privacy_page,
+)
+from cropnova.web.assessment_pages import saved_page
 
 ROOT = Path(__file__).resolve().parent
 STATIC_FILES = {
@@ -109,7 +118,7 @@ def read_body(environ, limit=100_000):
 
 def answer_request(environ, start_response, path):
     """Read a question only after checking its private report link."""
-    from assessment_questions import cached_answer
+    from cropnova.ai.assessment_questions import cached_answer
 
     def question_response(value, status="200 OK"):
         return respond(
@@ -202,6 +211,73 @@ def assessment_request(environ, start_response, path):
     )
 
 
+def fertilizer_request(environ, start_response, path):
+    """Calculate once, save a new snapshot, and redirect to avoid form resubmission."""
+    from cropnova.web.assessment_summary import build_summary
+    from cropnova.fertilizer.fertilizer_adviser import advise
+
+    parts = path.strip("/").split("/")
+    report = load_report(parts[1]) if len(parts) == 3 else None
+    private_headers = [("X-Robots-Tag", "noindex, nofollow, noarchive")]
+    if not report:
+        return respond(
+            start_response,
+            message_page(
+                "This assessment link has expired", "Start a new assessment to plan fertilizer."
+            ),
+            status="404 Not Found",
+            extra=private_headers,
+        )
+    try:
+        parsed = parse_qs(
+            read_body(environ, limit=20000), keep_blank_values=True, max_num_fields=40
+        )
+        values = {key: items[-1] for key, items in parsed.items()}
+    except BodyTooLarge:
+        return respond(
+            start_response,
+            message_page("That submission is too large", "Use a shorter fertilizer plan."),
+            status="413 Payload Too Large",
+            extra=private_headers,
+        )
+    except (ValueError, UnicodeDecodeError):
+        return respond(
+            start_response,
+            message_page(
+                "Please check your submission", "Return to the fertilizer adviser and try again."
+            ),
+            status="400 Bad Request",
+            extra=private_headers,
+        )
+    if set(values) <= {"crop"}:
+        from cropnova.fertilizer.fertilizer_views import CROP_GUIDANCE
+
+        if values.get("crop") not in CROP_GUIDANCE:
+            body = saved_page(report, parts[1], "fertilizer", fertilizer_feedback={"values": values, "error": "Choose a crop from the list."})
+            return respond(start_response, body, status="422 Unprocessable Entity", extra=private_headers)
+        token = save_report({**report, "fertilizer_inputs": values, "fertilizer_plan": None})
+        return respond(start_response, b"", status="303 See Other", extra=private_headers + [("Location", "/assessment/" + token + "/fertilizer#fertilizer-result")])
+    try:
+        result = advise(report.get("profile", {}), build_summary(report)["candidates"], values)
+    except ValueError as error:
+        body = saved_page(
+            report,
+            parts[1],
+            "fertilizer",
+            fertilizer_feedback={"values": values, "error": str(error)},
+        )
+        return respond(
+            start_response, body, status="422 Unprocessable Entity", extra=private_headers
+        )
+    token = save_report({**report, "fertilizer_inputs": values, "fertilizer_plan": result})
+    return respond(
+        start_response,
+        b"",
+        status="303 See Other",
+        extra=private_headers + [("Location", "/assessment/" + token + "/fertilizer")],
+    )
+
+
 def application(environ, start_response):
     method = environ.get("REQUEST_METHOD", "GET").upper()
     if method == "HEAD":
@@ -209,6 +285,8 @@ def application(environ, start_response):
         application({**environ, "REQUEST_METHOD": "GET"}, start_response)
         return [b""]
     path = environ.get("PATH_INFO", "/")
+    if method == "POST" and path.startswith("/assessment/") and path.endswith("/fertilizer"):
+        return fertilizer_request(environ, start_response, path)
     if method == "GET" and path in STATIC_FILES:
         filename, content_type = STATIC_FILES[path]
         return respond(
@@ -229,7 +307,7 @@ def application(environ, start_response):
     if method == "GET" and path == "/health":
         return respond(start_response, b'{"status":"ok"}', content_type="application/json")
     if method == "GET" and path == "/ready":
-        from deployment_checks import readiness
+        from cropnova.config.deployment_checks import readiness
 
         result = readiness()
         return respond(
@@ -259,7 +337,7 @@ def application(environ, start_response):
     if method == "GET" and path in public_pages:
         return respond(start_response, public_pages[path]())
     if method == "POST" and path == "/coverage-preview":
-        from coverage_preview import preview_coverage
+        from cropnova.web.coverage_preview import preview_coverage
 
         try:
             parsed = parse_qs(
@@ -292,7 +370,14 @@ def application(environ, start_response):
     if method == "GET" and path.startswith("/assessment/"):
         parts = path.strip("/").split("/")
         view = parts[2] if len(parts) == 3 else "results"
-        if len(parts) not in {2, 3} or view not in {"results", "report", "plan", "edit", "market"}:
+        if len(parts) not in {2, 3} or view not in {
+            "results",
+            "report",
+            "plan",
+            "edit",
+            "market",
+            "fertilizer",
+        }:
             return respond(
                 start_response,
                 message_page("We could not find that page", "Start a new assessment to continue."),
@@ -333,7 +418,7 @@ def application(environ, start_response):
                 ),
                 status="404 Not Found",
             )
-        from assessment_pdf import create_pdf
+        from cropnova.reports.assessment_pdf import create_pdf
 
         pdf = create_pdf(report, reference=token)
         return respond(
@@ -361,7 +446,7 @@ def create_app():
 
 
 if __name__ == "__main__":
-    from local_settings import load_local_settings
+    from cropnova.config.local_settings import load_local_settings
 
     load_local_settings()
     host = os.environ.get("HOST", "0.0.0.0" if "PORT" in os.environ else "127.0.0.1")

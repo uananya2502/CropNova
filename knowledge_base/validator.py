@@ -1,5 +1,5 @@
 from typing import Any
-from evidence import numeric_range
+from cropnova.core.evidence import numeric_range
 
 
 ALLOWED_STATUSES = {
@@ -222,7 +222,7 @@ def validate_knowledge(data: dict[str, Any]) -> list[str]:
             "water_requirement": {"low", "moderate", "high"},
         }.get(prop)
         if allowed:
-            from evidence import values
+            from cropnova.core.evidence import values
 
             parsed = values(fact.get("value"))
             if not parsed or not set(parsed).issubset(allowed):

@@ -9,6 +9,7 @@ COPY requirements.txt ./
 RUN python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.10.0 \
     && python -m pip install -r requirements.txt
 COPY *.py ./
+COPY cropnova/ ./cropnova/
 COPY knowledge_base/ ./knowledge_base/
 COPY rule_engine/ ./rule_engine/
 COPY static/ ./static/

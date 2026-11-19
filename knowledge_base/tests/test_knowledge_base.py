@@ -36,10 +36,7 @@ class TestKnowledgeBase(unittest.TestCase):
 
         self.assertGreater(len(facts), 0)
 
-        sources = {
-            source["source_id"]: source
-            for source in knowledge["sources"]
-        }
+        sources = {source["source_id"]: source for source in knowledge["sources"]}
 
         for fact in facts:
             self.assertIn(
@@ -59,9 +56,7 @@ class TestKnowledgeBase(unittest.TestCase):
         knowledge = load_knowledge()
         facts = get_usable_facts(knowledge, crop_id="wheat")
 
-        self.assertTrue(
-            all(fact["crop_id"] in ("all", "wheat") for fact in facts)
-        )
+        self.assertTrue(all(fact["crop_id"] in ("all", "wheat") for fact in facts))
 
     def test_unreviewed_facts_are_not_retrieved(self):
         knowledge = load_knowledge()

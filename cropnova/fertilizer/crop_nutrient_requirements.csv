@@ -1,0 +1,29 @@
+crop_id,crop_name,scientific_name,state,agro_climatic_zone,season,production_system,growth_stage,nutrient,recommended_min_kg_ha,recommended_max_kg_ha,source_value,source_unit,institution,document,year,page,url,verification_status
+wheat,Wheat,Triticum aestivum,Punjab,,Rabi,Medium fertility soil without a soil test,whole season,N,123.5527,123.5527,50,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,9,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+wheat,Wheat,Triticum aestivum,Punjab,,Rabi,Medium fertility soil without a soil test,whole season,P2O5,61.7763,61.7763,25,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,9,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+wheat,Wheat,Triticum aestivum,,,,,,K2O,,,,,,,,,not_verified
+barley,Barley,Hordeum vulgare,Punjab,,Rabi,Medium fertility soil without a soil test,whole season,N,61.7763,61.7763,25,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,24–25,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+barley,Barley,Hordeum vulgare,Punjab,,Rabi,Medium fertility soil without a soil test,whole season,P2O5,29.6526,29.6526,12,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,24–25,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+barley,Barley,Hordeum vulgare,,,,,,K2O,,,,,,,,,not_verified
+chickpea,Chickpea,Cicer arietinum,,,,,,N,,,,,,,,,not_verified
+chickpea,Chickpea,Cicer arietinum,,,,,,P2O5,,,,,,,,,not_verified
+chickpea,Chickpea,Cicer arietinum,,,,,,K2O,,,,,,,,,not_verified
+rice,Rice,Oryza sativa,,,,,,N,,,,,,,,,not_verified
+rice,Rice,Oryza sativa,,,,,,P2O5,,,,,,,,,not_verified
+rice,Rice,Oryza sativa,,,,,,K2O,,,,,,,,,not_verified
+maize,Maize,Zea mays,,,,,,N,,,,,,,,,not_verified
+maize,Maize,Zea mays,,,,,,P2O5,,,,,,,,,not_verified
+maize,Maize,Zea mays,,,,,,K2O,,,,,,,,,not_verified
+cotton,Cotton,Gossypium spp.,,,,,,N,,,,,,,,,not_verified
+cotton,Cotton,Gossypium spp.,,,,,,P2O5,,,,,,,,,not_verified
+cotton,Cotton,Gossypium spp.,,,,,,K2O,,,,,,,,,not_verified
+groundnut,Groundnut,Arachis hypogaea,,,,,,N,,,,,,,,,not_verified
+groundnut,Groundnut,Arachis hypogaea,,,,,,P2O5,,,,,,,,,not_verified
+groundnut,Groundnut,Arachis hypogaea,,,,,,K2O,,,,,,,,,not_verified
+soybean,Soybean,Glycine max,,,,,,N,,,,,,,,,not_verified
+soybean,Soybean,Glycine max,,,,,,P2O5,,,,,,,,,not_verified
+soybean,Soybean,Glycine max,,,,,,K2O,,,,,,,,,not_verified
+oats,Oats,Avena sativa,Punjab,,Rabi,Single-cut fodder oats,at sowing,N,37.0658,37.0658,15,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,101,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+oats,Oats,Avena sativa,Punjab,,Rabi,Single-cut fodder oats,at sowing,P2O5,19.7684,19.7684,8,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,101,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+oats,Oats,Avena sativa,Punjab,,Rabi,Single-cut fodder oats,30–40 days after sowing,N,37.0658,37.0658,15,kg/acre,PAU,"Package of Practices for Crops of Punjab, Rabi 2025–26",2025,101,https://www.pau.edu/content/ccil/pf/pp_rabi.pdf,verified_source
+oats,Oats,Avena sativa,,,,,,K2O,,,,,,,,,not_verified

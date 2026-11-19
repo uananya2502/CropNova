@@ -26,9 +26,7 @@ def get_usable_facts(
     }
 
     known_crops = {
-        crop.get("crop_id")
-        for crop in knowledge.get("crops", [])
-        if isinstance(crop, dict)
+        crop.get("crop_id") for crop in knowledge.get("crops", []) if isinstance(crop, dict)
     }
 
     if crop_id is not None and crop_id not in known_crops:
@@ -58,8 +56,7 @@ def get_usable_facts(
 
         sources_reviewed = all(
             source_id in sources
-            and sources[source_id].get("review_status")
-            == "reviewed_for_inclusion"
+            and sources[source_id].get("review_status") == "reviewed_for_inclusion"
             for source_id in source_ids
         )
 

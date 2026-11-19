@@ -9,13 +9,13 @@ from urllib.parse import urlencode, urlsplit
 
 import pytest
 from app import application, assess
-from report_store import save_report, load_report
-from public_profiles import REFERENCE_PROFILES
+from cropnova.reports.report_store import save_report, load_report
+from cropnova.config.public_profiles import REFERENCE_PROFILES
 
 
 @pytest.fixture(autouse=True)
 def private_storage(tmp_path, monkeypatch):
-    monkeypatch.setattr("report_store.DATABASE_PATH", tmp_path / "reports.sqlite3")
+    monkeypatch.setattr("cropnova.reports.report_store.DATABASE_PATH", tmp_path / "reports.sqlite3")
 
 
 def request(path="/", method="GET", values=None):
@@ -85,16 +85,18 @@ def test_result_report_and_plan_are_distinct_pages_without_embedded_forms():
 
 def test_market_page_uses_saved_crop_and_keeps_private_access(tmp_path, monkeypatch):
     import csv
-    from mandi_data import FIELDS
+    from cropnova.market.mandi_data import FIELDS
 
     monkeypatch.setenv("CROPNOVA_DATA_DIR", str(tmp_path))
     with (tmp_path / "mandi_prices.csv").open("w", newline="") as stream:
         writer = csv.writer(stream)
         writer.writerow(FIELDS)
-        writer.writerow(("Haryana", "Karnal", "Karnal APMC", "Wheat", "Dara",
-                         "FAQ", "2025-01-01", 2400))
-        writer.writerow(("Punjab", "Ludhiana", "Ludhiana APMC", "Wheat", "Dara",
-                         "FAQ", "2025-01-01", 2500))
+        writer.writerow(
+            ("Haryana", "Karnal", "Karnal APMC", "Wheat", "Dara", "FAQ", "2025-01-01", 2400)
+        )
+        writer.writerow(
+            ("Punjab", "Ludhiana", "Ludhiana APMC", "Wheat", "Dara", "FAQ", "2025-01-01", 2500)
+        )
     base, before = saved()
     assert f'href="{base}/market"' in request(base)["body"].decode()
     response = request(base + "/market?series=unknown")
@@ -154,7 +156,9 @@ def test_readiness_checks_database_and_knowledge_without_model_calls():
 
 
 def test_readiness_failure_is_unavailable_without_private_error_text():
-    with patch("deployment_checks.connect", side_effect=RuntimeError("secret-path")):
+    with patch(
+        "cropnova.config.deployment_checks.connect", side_effect=RuntimeError("secret-path")
+    ):
         response = request("/ready")
     assert response["status"] == "503 Service Unavailable"
     assert b"secret-path" not in response["body"]
@@ -170,8 +174,8 @@ def test_invalid_form_stays_on_form_page_with_values():
 
 
 def test_provider_limit_is_shared_and_does_not_queue_excess_calls(monkeypatch):
-    import genai_explainer
-    import assessment_questions
+    import cropnova.ai.genai_explainer as genai_explainer
+    import cropnova.ai.assessment_questions as assessment_questions
 
     assert genai_explainer.GENERATION_SLOTS is assessment_questions.GENERATION_SLOTS
     slots = genai_explainer.GENERATION_SLOTS
@@ -180,7 +184,7 @@ def test_provider_limit_is_shared_and_does_not_queue_excess_calls(monkeypatch):
     try:
         monkeypatch.setenv("AI_PROVIDER", "gemini")
         monkeypatch.setenv("GEMINI_API_KEY", "fake")
-        with patch("genai_explainer.call_gemini") as provider:
+        with patch("cropnova.ai.genai_explainer.call_gemini") as provider:
             result = genai_explainer.generate_explanation(
                 assess(REFERENCE_PROFILES["reference-wheat"]), requested=True
             )

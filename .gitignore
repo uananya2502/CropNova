@@ -4,17 +4,23 @@ __pycache__/
 .DS_Store
 .env
 .pytest_cache/
-__pycache__/
-*.py[cod]
-.venv/
 
 instance/
+instance.zip
 .env.*
 !.env.example
 
 tmp/
 
-# Account setup screenshots and generated private assessment exports.
-reports/verification/
-output/pdf/CropNova-Farm-Assessment.pdf
-reports/rendered/
+# Local reports, presentations, and study materials.
+/output/
+/docs/
+/reports/
+/research/
+/README.md
+/knowledge_base/knowledge_policy.md
+*.pdf
+*.ppt
+*.pptx
+*.doc
+*.docx

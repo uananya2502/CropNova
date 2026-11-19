@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from deployment_checks import readiness
+from cropnova.config.deployment_checks import readiness
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
         raise SystemExit(1)
     print("Published knowledge and assessment storage: ready")
     if args.require_model:
-        from semantic_search import load_encoder, SearchUnavailable
+        from cropnova.ai.semantic_search import load_encoder, SearchUnavailable
 
         try:
             load_encoder()

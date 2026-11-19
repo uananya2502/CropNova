@@ -7,7 +7,7 @@ import sys
 from tempfile import NamedTemporaryFile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from mandi_data import FIELDS, data_path, normalized, observation
+from cropnova.market.mandi_data import FIELDS, data_path, normalized, observation
 
 
 def input_rows(path):
@@ -22,8 +22,10 @@ def input_rows(path):
         with path.open(encoding="utf-8-sig", newline="") as stream:
             reader = csv.DictReader(stream)
             # The AGMARKNET export and prepared Parquet use slightly different headers.
-            headers = {name.strip().casefold().replace(" ", "_"): name
-                       for name in (reader.fieldnames or [])}
+            headers = {
+                name.strip().casefold().replace(" ", "_"): name
+                for name in (reader.fieldnames or [])
+            }
             if not all(field.casefold() in headers for field in FIELDS):
                 raise ValueError(f"{path.name} is missing required columns: {', '.join(FIELDS)}")
             for row in reader:
@@ -33,14 +35,17 @@ def input_rows(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("files", nargs="+", type=Path)
-    parser.add_argument("--state", action="append", default=[], help="Optional state filter, repeatable")
+    parser.add_argument(
+        "--state", action="append", default=[], help="Optional state filter, repeatable"
+    )
     args = parser.parse_args()
     states = {normalized(state) for state in args.state}
     target = data_path()
     target.parent.mkdir(parents=True, exist_ok=True)
     count = 0
-    with NamedTemporaryFile(mode="w", encoding="utf-8", newline="", dir=target.parent,
-                            delete=False) as stream:
+    with NamedTemporaryFile(
+        mode="w", encoding="utf-8", newline="", dir=target.parent, delete=False
+    ) as stream:
         temporary = Path(stream.name)
         try:
             writer = csv.writer(stream)

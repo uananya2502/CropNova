@@ -27,11 +27,7 @@ def test_rule_fires_with_verified_crop_knowledge():
 
     evaluation = evaluate_rules(user_profile, facts)
 
-    kb_result = next(
-        result
-        for result in evaluation.results
-        if result.rule_id == "RULE_KB_001"
-    )
+    kb_result = next(result for result in evaluation.results if result.rule_id == "RULE_KB_001")
 
     assert kb_result.status == RuleStatus.FIRED
     assert "FACT_WHEAT_001" in kb_result.fact_ids
@@ -106,10 +102,7 @@ def test_multiple_rules_are_evaluated():
         ],
     )
 
-    rule_ids = {
-        result.rule_id
-        for result in evaluation.results
-    }
+    rule_ids = {result.rule_id for result in evaluation.results}
 
     assert "RULE_KB_001" in rule_ids
     assert "RULE_WATER_001" in rule_ids
@@ -160,10 +153,7 @@ def test_rule_engine_with_real_knowledge_base():
 
     assert evaluation.results
 
-    rule_ids = {
-        result.rule_id
-        for result in evaluation.results
-    }
+    rule_ids = {result.rule_id for result in evaluation.results}
 
     assert "RULE_KB_001" in rule_ids
     assert "RULE_WATER_001" in rule_ids

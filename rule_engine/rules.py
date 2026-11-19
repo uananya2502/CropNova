@@ -134,7 +134,7 @@ def _evidence_rules() -> tuple[Rule, ...]:
 
 def condition_season_matches(user_profile, facts):
     """Infer a seasonal candidate without bypassing the other CSP requirements."""
-    from constraint_definitions import SeasonConstraint, CheckStatus
+    from cropnova.core.constraint_definitions import SeasonConstraint, CheckStatus
 
     crop_id = user_profile.get("crop_id")
     if not crop_id:

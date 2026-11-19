@@ -8,14 +8,14 @@ from urllib.parse import urlencode
 
 import pytest
 from app import application
-from assessment_form import render_form
-from form_choices import DISTRICTS, STATES, numeric_choices, submitted_crops
-from public_profiles import REFERENCE_PROFILES
+from cropnova.web.assessment_form import render_form
+from cropnova.web.form_choices import DISTRICTS, STATES, numeric_choices, submitted_crops
+from cropnova.config.public_profiles import REFERENCE_PROFILES
 
 
 @pytest.fixture(autouse=True)
 def private_storage(tmp_path, monkeypatch):
-    monkeypatch.setattr("report_store.DATABASE_PATH", tmp_path / "reports.sqlite3")
+    monkeypatch.setattr("cropnova.reports.report_store.DATABASE_PATH", tmp_path / "reports.sqlite3")
 
 
 def response(path, values=None, query=""):
@@ -104,7 +104,9 @@ def test_loaded_profile_can_be_submitted_from_menus_and_matches_all_checks(prese
     page = response("/assess", query="preset=" + preset)
     parser = FieldParser()
     parser.feed(page["body"].decode())
-    with patch("app.generate_explanation") as provider, patch("report_store.save_report") as store:
+    with patch("app.generate_explanation") as provider, patch(
+        "cropnova.reports.report_store.save_report"
+    ) as store:
         preview = response("/coverage-preview", parser.values)
     data = json.loads(preview["body"])
     assert data["state"] == "ready"
@@ -140,8 +142,8 @@ def test_missing_water_preview_identifies_water_and_not_a_random_general_error()
 
 
 def test_preview_does_not_request_generation_even_when_ai_menu_is_yes():
-    with patch("genai_explainer.call_gemini") as google, patch(
-        "genai_explainer.call_openai"
+    with patch("cropnova.ai.genai_explainer.call_gemini") as google, patch(
+        "cropnova.ai.genai_explainer.call_openai"
     ) as paid, patch("app.save_report") as save:
         result = response(
             "/coverage-preview", {**REFERENCE_PROFILES["reference-wheat"], "use_genai": "yes"}

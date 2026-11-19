@@ -72,7 +72,7 @@ def evaluate_rules(
     Evaluate all enabled CropNova rules.
     """
 
-    from evidence import scope_matches
+    from cropnova.core.evidence import scope_matches
 
     facts = [
         f

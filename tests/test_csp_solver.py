@@ -1,7 +1,7 @@
 import unittest
 
-from csp_solver import solve_constraints
-from constraint_definitions import SeasonConstraint
+from cropnova.core.csp_solver import solve_constraints
+from cropnova.core.constraint_definitions import SeasonConstraint
 
 
 def fact(fact_id, prop, value):
@@ -72,7 +72,7 @@ class TestCSPSolver(unittest.TestCase):
             "MISSING_USER_INPUT",
         )
         self.assertFalse(result["diagnostics"]["unknown_is_satisfied"])
-    
+
     def test_wheat_rabi_season_uses_verified_fact(self):
         from knowledge_base.loader import load_knowledge
         from knowledge_base.retrieval import get_usable_facts
@@ -105,18 +105,17 @@ class TestCSPSolver(unittest.TestCase):
         self.assertNotIn("FACT_WHEAT_004", result.fact_ids)
         self.assertIn("FACT_WHEAT_GROWING_SEASON_20261029", result.fact_ids)
 
-
     def test_unverified_fact_is_not_satisfied(self):
         item = candidate("A")
         item["facts"][0]["verification_status"] = "pending_research"
         result = solve_constraints([item], PROFILE)
         self.assertEqual(result["status"], "incomplete")
         self.assertEqual(result["feasible_candidates"], [])
-    
+
     def test_numeric_wheat_water_range_returns_unknown_with_evidence(self):
         from knowledge_base.loader import load_knowledge
         from knowledge_base.retrieval import get_usable_facts
-        from constraint_definitions import WaterConstraint
+        from cropnova.core.constraint_definitions import WaterConstraint
 
         knowledge = load_knowledge()
         facts = get_usable_facts(knowledge, crop_id="wheat")
@@ -138,11 +137,11 @@ class TestCSPSolver(unittest.TestCase):
         self.assertIn("water.budget_mm", result.missing_fields)
         self.assertIn("FACT_WHEAT_WATER_SCREENING_RANGE_MM_REF_V3", result.fact_ids)
         self.assertIn("SRC_FAO_SEASONAL_WATER", result.source_ids)
-    
+
     def test_removed_soil_evidence_returns_unknown(self):
         from knowledge_base.loader import load_knowledge
         from knowledge_base.retrieval import get_usable_facts
-        from constraint_definitions import (
+        from cropnova.core.constraint_definitions import (
             SoilTextureConstraint,
             SoilPHConstraint,
         )
@@ -151,8 +150,7 @@ class TestCSPSolver(unittest.TestCase):
         facts = get_usable_facts(knowledge, crop_id="wheat")
 
         # Simulate an incomplete dataset; the merged dataset has soil references.
-        facts = [f for f in facts if f.get("property") not in
-                 {"soil_texture", "soil_ph_range"}]
+        facts = [f for f in facts if f.get("property") not in {"soil_texture", "soil_ph_range"}]
         candidate = {"candidate_id": "wheat", "name": "Wheat"}
         profile = {
             "region": {"state": "Haryana", "district": "Rewari"},
@@ -174,4 +172,3 @@ class TestCSPSolver(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

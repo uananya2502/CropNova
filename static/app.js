@@ -256,3 +256,17 @@ for (const form of document.querySelectorAll('[data-assessment-form]')) {
         });
     updatePreview();
 }
+
+// Keep the chosen fertilizer source visible and disable the unused inputs.
+for (const fertilizerForm of document.querySelectorAll('[data-fertilizer-form]')) {
+    const basis = fertilizerForm.querySelector('[name="basis"]');
+    function showFertilizerSource() {
+        for (const section of fertilizerForm.querySelectorAll('[data-fertilizer-section]')) {
+            const active = section.dataset.fertilizerSection === basis.value;
+            section.hidden = !active;
+            section.disabled = !active;
+        }
+    }
+    basis.addEventListener('change', showFertilizerSource);
+    showFertilizerSource();
+}

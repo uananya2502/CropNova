@@ -2187,20 +2187,6 @@ input::placeholder {
 .question-evidence a { display: block; font-size: .85rem; margin-top: .5rem; }
 .question-panel button:disabled { opacity: .6; cursor: wait; }
 
-/* Soft reference alignment and the order of follow-up tasks. */
-.condition-alignment, .preparation-plan { margin-top: 2rem; }
-.alignment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 1rem; margin: 1.25rem 0; }
-.alignment-card { padding: 1.1rem; background: #f5f5ed; border: 1px solid #dce1d6; border-radius: .6rem; }
-.alignment-card h3 { margin-top: 0; }
-.alignment-score { font-family: Georgia, serif; font-size: 2.4rem; }
-.alignment-score span { font: .8rem Arial, sans-serif; color: #526052; }
-.alignment-card meter { display: block; width: 100%; height: 1rem; margin-bottom: 1rem; accent-color: #466b49; }
-.alignment-card details { font-size: .88rem; }
-.alignment-card summary, .preparation-plan summary { cursor: pointer; padding: .5rem 0; }
-.preparation-steps { padding-left: 1.5rem; }
-.preparation-steps li { padding: .7rem .3rem; border-bottom: 1px solid #e0e4da; }
-.preparation-steps span { display: block; font-size: .8rem; color: #526052; margin-top: .25rem; }
-
 /* Multi-page layout: a clear destination for each part of the assessment. */
 #main { min-height: 65vh; }
 .nav { flex-wrap: wrap; gap: 1rem; }

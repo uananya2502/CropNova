@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from agent import run_assessment
+from cropnova.core.agent import run_assessment
 
 
 VALID = {
@@ -19,9 +19,7 @@ VALID = {
 class TestAgent(unittest.TestCase):
 
     def test_invalid_profile_has_structured_error(self):
-        result = run_assessment(
-            {**VALID, "soil_ph": "20"}
-        )
+        result = run_assessment({**VALID, "soil_ph": "20"})
 
         self.assertEqual(
             result["status"],
@@ -46,9 +44,7 @@ class TestAgent(unittest.TestCase):
             [],
         )
 
-        self.assertTrue(
-            result["unknown_options"]
-        )
+        self.assertTrue(result["unknown_options"])
 
         self.assertEqual(
             result["knowledge_summary"]["total_crops"],
@@ -79,10 +75,7 @@ class TestAgent(unittest.TestCase):
         )
 
         self.assertTrue(
-            any(
-                "season" in question.casefold()
-                for question in result["follow_up_questions"]
-            )
+            any("season" in question.casefold() for question in result["follow_up_questions"])
         )
 
     def test_evidence_package_preserves_status(self):
@@ -100,15 +93,10 @@ class TestAgent(unittest.TestCase):
                 "fact_id": fact_id,
                 "crop_id": "fixture-crop",
                 "category": prop,
-                "statement": (
-                    f"Synthetic {prop} fact "
-                    "for integration testing."
-                ),
+                "statement": (f"Synthetic {prop} fact " "for integration testing."),
                 "value": value,
                 "unit": None,
-                "verification_status": (
-                    "verified_context_specific"
-                ),
+                "verification_status": ("verified_context_specific"),
                 "source_ids": ["SRC001"],
                 "applicability": {
                     "country": "India",
@@ -154,31 +142,22 @@ class TestAgent(unittest.TestCase):
                     "scientific_name": "Fixture example",
                     "status": "active_prototype",
                     "source_ids": ["SRC001"],
-                    "fact_ids": [
-                        item["fact_id"]
-                        for item in facts
-                    ],
+                    "fact_ids": [item["fact_id"] for item in facts],
                 }
             ],
             "facts": facts,
             "sources": [
                 {
                     "source_id": "SRC001",
-                    "title": (
-                        "Synthetic integration fixture"
-                    ),
-                    "url": (
-                        "https://example.test/source"
-                    ),
-                    "review_status": (
-                        "reviewed_for_inclusion"
-                    ),
+                    "title": ("Synthetic integration fixture"),
+                    "url": ("https://example.test/source"),
+                    "review_status": ("reviewed_for_inclusion"),
                 }
             ],
         }
 
         with patch(
-            "agent.load_knowledge",
+            "cropnova.core.agent.load_knowledge",
             return_value=knowledge,
         ):
             result = run_assessment(VALID)
@@ -189,16 +168,12 @@ class TestAgent(unittest.TestCase):
         )
 
         self.assertEqual(
-            result["feasible_options"][0][
-                "candidate_id"
-            ],
+            result["feasible_options"][0]["candidate_id"],
             "fixture-crop",
         )
 
         self.assertEqual(
-            result["knowledge_summary"][
-                "verified_facts"
-            ],
+            result["knowledge_summary"]["verified_facts"],
             4,
         )
 
@@ -256,16 +231,10 @@ class TestAgent(unittest.TestCase):
         )
 
         # At least one crop should have been evaluated.
-        self.assertTrue(
-            result["rule_results"]
-        )
+        self.assertTrue(result["rule_results"])
 
         # Wheat should be among the evaluated crops.
-        wheat_result = next(
-            item
-            for item in result["rule_results"]
-            if item["crop_id"] == "wheat"
-        )
+        wheat_result = next(item for item in result["rule_results"] if item["crop_id"] == "wheat")
 
         # Each crop should contain Rule Engine results.
         self.assertIn(
@@ -273,16 +242,11 @@ class TestAgent(unittest.TestCase):
             wheat_result,
         )
 
-        self.assertTrue(
-            wheat_result["results"]
-        )
+        self.assertTrue(wheat_result["results"])
 
         # Verify that our actual Rule Engine rules
         # reached the Agent.
-        rule_ids = {
-            result_item["rule_id"]
-            for result_item in wheat_result["results"]
-        }
+        rule_ids = {result_item["rule_id"] for result_item in wheat_result["results"]}
 
         self.assertIn(
             "RULE_KB_001",
@@ -293,9 +257,9 @@ class TestAgent(unittest.TestCase):
             "RULE_WATER_001",
             rule_ids,
         )
-    
+
     def test_candidate_records_excludes_unreviewed_nested_facts(self):
-        from agent import _candidate_records
+        from cropnova.core.agent import _candidate_records
 
         knowledge = {
             "crops": [

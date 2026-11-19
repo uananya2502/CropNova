@@ -1,13 +1,16 @@
 from datetime import date, timedelta
 
-from mandi_forecast import assess_forecast
-from mandi_page import market_guidance
+from cropnova.market.mandi_forecast import assess_forecast
+from cropnova.market.mandi_page import market_guidance
 
 
 def weekly_series(prices):
     start = date(2024, 1, 1)
-    return [(start + timedelta(weeks=week, days=day), price)
-            for week, price in enumerate(prices) for day in range(3, 6)]
+    return [
+        (start + timedelta(weeks=week, days=day), price)
+        for week, price in enumerate(prices)
+        for day in range(3, 6)
+    ]
 
 
 def test_regression_beats_persistence_and_stale_series_stops_current_forecast():
